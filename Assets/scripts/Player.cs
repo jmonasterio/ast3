@@ -3,45 +3,38 @@ using Toolbox;
 
 public class Player : Base2DBehaviour
 {
-    
+
     public float RotateSpeed = 100.0f;
     public float Thrust = 100.0f;
     public float AngleIncrement = 5.0f;
     public ParticleEmitter ParticleEmitter;
     private Rect _camRect;
-    private float _targetAngle { get; set; }
-    //ivate bool _lastAngleChangeWasIncrement;
 
     // Use this for initialization
     void Start ()
     {
+#if UNITY_EDITOR
+        QualitySettings.vSyncCount = 0;  // VSync must be disabled
+#endif
+
         _camRect = GetCameraWorldRect();
     }
 
+    void OnGUI()
+    {
+        print(GetFrameRate());
+    }
+
     // Update is called once per frame
-    void Update () {
+    void Update ()
+    {
+        base.TickFrameRate();
+        //base.DebugForceSinusoidalFrameRate();
 
-	    float horz = Input.GetAxisRaw("Horizontal");
-        
-        //RotateTransformByIncrement( horz, AngleIncrement, RotateSpeed, ref _targetAngle, )
-        
+        float horz = Input.GetAxisRaw("Horizontal");
 
-        // The bug here is that we may be stopping if we're really close to 5 degree increment.
-        // So our speed is not consistent.
-        if (horz != 0.0f)
-	    {
-	        float angleToRotate = -horz*AngleIncrement;
-            var curAngle = transform.eulerAngles.z;
-            _targetAngle = MathfExt.RoundToNearestMultiple( curAngle + angleToRotate, AngleIncrement);
-	        var newAngle = Mathf.MoveTowardsAngle(curAngle, _targetAngle, RotateSpeed*Time.deltaTime);
-	        transform.Rotate( 0.0f, 0.0f, newAngle-curAngle );
-	    }
-        else if (0.0f != Mathf.DeltaAngle(_targetAngle, transform.rotation.eulerAngles.z))
-        {
-            var curAngle = transform.eulerAngles.z;
-            var newAngle = Mathf.MoveTowardsAngle(curAngle, _targetAngle, RotateSpeed * Time.deltaTime);
-            transform.Rotate(0.0f, 0.0f, newAngle-curAngle);
-        }
+        base.InstantAngleChange(horz, AngleIncrement, RotateSpeed);
+
 
         bool vert = Input.GetButton("Vertical");
         if (vert )
