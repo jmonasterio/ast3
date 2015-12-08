@@ -79,7 +79,7 @@ public class LevelManager : Base2DBehaviour {
 
     public void StartLevel()
     {
-        AddAsteroids(50);
+        AddAsteroids(5);
     }
 
     public void PlayerKilled(GameManager.PlayerInfo playerInfo)

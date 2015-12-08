@@ -69,6 +69,7 @@ public class Player : Wrapped2D
         }
         _state = State.Killed;
         Show(false);
+        _exhaust.Stop();
         _explosion.Play();
         StartCoroutine(DestroyPlayerLater());
         GameManager.Instance.PlayerKilled(this);
@@ -78,7 +79,27 @@ public class Player : Wrapped2D
     {
         yield return new WaitForSeconds(1.0f);
 
+        SafeDestroy( ref _explosion);
+        SafeDestroy( ref _exhaust);
         Destroy(this);
+    }
+
+    void SafeDestroy(ref Component obj)
+    {
+        if (obj != null)
+        {
+        }
+        Destroy( obj);
+        obj = null;
+    }
+
+    void SafeDestroy(ref ParticleSystem obj)
+    {
+        if (obj != null)
+        {
+        }
+        Destroy(obj);
+        obj = null;
     }
 
     // Update is called once per frame
