@@ -48,7 +48,7 @@ namespace Toolbox
         /// <summary>
         /// Call this in the Update() function.
         /// </summary>
-        protected void TickFrameRate()
+        public void TickFrameRate()
         {
             _deltaTime += (Time.deltaTime - _deltaTime)*0.1f;
         }
@@ -120,30 +120,30 @@ namespace Toolbox
         }
     }
 
-    public class Singleton<T> : MonoBehaviour where T : MonoBehaviour
+    public class Singleton<T> : Base2DBehaviour where T:Base2DBehaviour
     {
-        protected static T instance;
+        protected static T _instance;
 
         /**
-           Returns the instance of this singleton.
+           Returns the _instance of this singleton.
         */
         public static T Instance
         {
 
             get
             {
-                if (instance == null)
+                if (_instance == null)
                 {
-                    instance = (T)FindObjectOfType(typeof(T));
+                    _instance = (T)FindObjectOfType(typeof(T));
 
-                    if (instance == null)
+                    if (_instance == null)
                     {
-                        Debug.LogError("An instance of " + typeof(T) +
+                        Debug.LogError("An _instance of " + typeof(T) +
                            " is needed in the scene, but there is none.");
                     }
                 }
 
-                return instance;
+                return _instance;
             }
         }
     }

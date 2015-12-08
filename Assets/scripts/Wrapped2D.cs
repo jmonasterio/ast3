@@ -2,39 +2,43 @@
 using System.Collections;
 using Toolbox;
 
-public class Wrapped2D : Base2DBehaviour {
+public class Wrapped2D : Base2DBehaviour
+{
 
-    protected Rect _camRect;
-
-    public virtual void Start()
-    {
-        _camRect = GetCameraWorldRect();
-    }
+    protected Rect? _camRect = null;
 
 
     protected void WrapScreen()
     {
+
+        if (!_camRect.HasValue)
+        {
+            // Cache
+            _camRect = GetCameraWorldRect();
+        }
+        var camRect = _camRect.Value;
+
         // If this fails, you did not call base.Start();
-        if (_camRect.Contains(this.PosTo2D()))
+        if (camRect.Contains(this.PosTo2D()))
         {
             return;
         }
         var t = PosTo2D();
-        if (t.x > _camRect.xMax)
+        if (t.x > camRect.xMax)
         {
-            t.x = _camRect.xMin;
+            t.x = camRect.xMin;
         }
-        else if (t.x < _camRect.xMin)
+        else if (t.x < camRect.xMin)
         {
-            t.x = _camRect.xMax;
+            t.x = camRect.xMax;
         }
-        if (t.y > _camRect.yMax)
+        if (t.y > camRect.yMax)
         {
-            t.y = _camRect.yMin;
+            t.y = camRect.yMin;
         }
-        else if (t.y < _camRect.yMin)
+        else if (t.y < camRect.yMin)
         {
-            t.y = _camRect.yMax;
+            t.y = camRect.yMax;
         }
         PosFrom2D(t);
     }

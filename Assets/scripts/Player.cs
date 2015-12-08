@@ -1,4 +1,6 @@
-﻿using UnityEngine;
+﻿using System.Collections;
+using System.Collections.Generic;
+using UnityEngine;
 using Toolbox;
 
 public class Player : Wrapped2D
@@ -8,32 +10,50 @@ public class Player : Wrapped2D
     public float Thrust = 100.0f;
     public float AngleIncrement = 5.0f;
     public float MaxSpeed = 50.0f;
-    public ParticleSystem ParticleEmitter;
-    public Transform Ghost;
+    public int PlayerIndex = 0; // Or 1, for 2 players.
+    public ParticleSystem ExhaustParticlePrefab;
+    public ParticleSystem ExplosionParticlePrefab;
+    public Transform GhostPrefab;
     //private Transform[] Ghosts = new Transform[4];
-    private ParticleSystem _emitter;
+    private ParticleSystem _exhaust;
+    private ParticleSystem _explosion;
+
+    private enum State
+    {
+        Alive = 0,
+        Killed = 1
+    }
+
+    private State _state;
+
 
     // Use this for initialization
-    public override void Start()
+    public void Start()
     {
-        base.Start();
-#if UNITY_EDITOR
-        QualitySettings.vSyncCount = 0;  // VSync must be disabled
-#endif
-        _emitter = (ParticleSystem) Instantiate(ParticleEmitter, new Vector3(0.015f, -0.15f, 0.0f), ParticleEmitter.transform.rotation);
-        _emitter.transform.parent = this.transform;
-        //_emitter.enableEmission = true;
-        _emitter.Stop();
+        _exhaust = Instantiate(ExhaustParticlePrefab);
+        _exhaust.transform.parent = this.transform;
+        _exhaust.transform.position = ExhaustParticlePrefab.transform.position; //new Vector3(0.015f, -0.15f, 0.0f);
+        _exhaust.transform.rotation = ExhaustParticlePrefab.transform.rotation;
+        //_exhaust.enableEmission = true;
+        _exhaust.Stop();
 
-        //var newGhost = (Transform)Instantiate(Ghost, new Vector3(0, _camRect.height, 0), Quaternion.identity);
+        _explosion = Instantiate(ExplosionParticlePrefab);
+        _explosion.transform.parent = this.transform;
+        _explosion.transform.position = ExhaustParticlePrefab.transform.position; //new Vector3(0.015f, -0.15f, 0.0f);
+        _explosion.transform.rotation = ExhaustParticlePrefab.transform.rotation;
+        _explosion.loop = false;
+        _explosion.Stop();
+
+        //var newGhost = (Transform)Instantiate(GhostPrefab, new Vector3(0, _camRect.height, 0), Quaternion.identity);
         //newGhost.parent = transform;
-        //newGhost = (Transform)Instantiate(Ghost, new Vector3(0, -_camRect.height, 0), Quaternion.identity);
+        //newGhost = (Transform)Instantiate(GhostPrefab, new Vector3(0, -_camRect.height, 0), Quaternion.identity);
         //newGhost.parent = transform;
-        //newGhost = (Transform)Instantiate(Ghost, new Vector3(_camRect.width, 0, 0), Quaternion.identity);
+        //newGhost = (Transform)Instantiate(GhostPrefab, new Vector3(_camRect.width, 0, 0), Quaternion.identity);
         //newGhost.parent = transform;
-        //newGhost = (Transform)Instantiate(Ghost, new Vector3(-_camRect.width, 0, 0), Quaternion.identity);
+        //newGhost = (Transform)Instantiate(GhostPrefab, new Vector3(-_camRect.width, 0, 0), Quaternion.identity);
         //newGhost.parent = transform;
 
+        _state = State.Alive;
     }
 
     void OnGUI()
@@ -41,10 +61,34 @@ public class Player : Wrapped2D
         //print(GetFrameRate());
     }
 
+    void OnTriggerEnter2D(Collider2D other)
+    {
+        if (_state == State.Killed)
+        {
+            return;
+        }
+        _state = State.Killed;
+        Show(false);
+        _explosion.Play();
+        StartCoroutine(DestroyPlayerLater());
+        GameManager.Instance.PlayerKilled(this);
+    }
+
+    private IEnumerator DestroyPlayerLater()
+    {
+        yield return new WaitForSeconds(1.0f);
+
+        Destroy(this);
+    }
+
     // Update is called once per frame
     void Update ()
     {
-        base.TickFrameRate();
+        if (_state == State.Killed)
+        {
+            return;
+        }
+
         //base.DebugForceSinusoidalFrameRate();
 
         float horz = Input.GetAxisRaw("Horizontal");
@@ -58,28 +102,24 @@ public class Player : Wrapped2D
             var rigidBody = GetComponent<Rigidbody2D>();
             rigidBody.AddRelativeForce(Vector2.up * Thrust * Time.deltaTime);
             rigidBody.velocity = Vector2.ClampMagnitude(rigidBody.velocity, MaxSpeed);
-            if (_emitter.isStopped)
+            if (_exhaust.isStopped)
             {
-                _emitter.Play();
+                _exhaust.Play();
             }
-            //if (!ParticleEmitter.isPlaying)
-            //{
-            //    ParticleEmitter.Play();
-            //}
         }
         else
         {
-            if (_emitter.isPlaying)
+            if (_exhaust.isPlaying)
             {
-                _emitter.Stop();
+                _exhaust.Stop();
             }
-            //if (!ParticleEmitter.isStopped)
-            //{
-            //    ParticleEmitter.Stop();
-            //}
         }
 
         WrapScreen();
     }
 
+    public void Show(bool b)
+    {
+        GetComponent<SpriteRenderer>().enabled = b;
+    }
 }
