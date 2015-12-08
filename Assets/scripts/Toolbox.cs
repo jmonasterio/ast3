@@ -18,7 +18,7 @@ namespace Toolbox
 
         public float GetFrameRate()
         {
-            float msec = _deltaTime*1000.0f;
+            //float msec = _deltaTime*1000.0f;
             float fps = 1.0f/_deltaTime;
             return fps;
         }

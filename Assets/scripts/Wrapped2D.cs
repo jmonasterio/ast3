@@ -4,7 +4,7 @@ using Toolbox;
 
 public class Wrapped2D : Base2DBehaviour {
 
-    private Rect _camRect;
+    protected Rect _camRect;
 
     public virtual void Start()
     {

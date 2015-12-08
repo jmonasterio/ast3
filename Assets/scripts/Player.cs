@@ -8,7 +8,10 @@ public class Player : Wrapped2D
     public float Thrust = 100.0f;
     public float AngleIncrement = 5.0f;
     public float MaxSpeed = 50.0f;
-    public ParticleEmitter ParticleEmitter;
+    public ParticleSystem ParticleEmitter;
+    public Transform Ghost;
+    //private Transform[] Ghosts = new Transform[4];
+    private ParticleSystem _emitter;
 
     // Use this for initialization
     public override void Start()
@@ -17,11 +20,25 @@ public class Player : Wrapped2D
 #if UNITY_EDITOR
         QualitySettings.vSyncCount = 0;  // VSync must be disabled
 #endif
+        _emitter = (ParticleSystem) Instantiate(ParticleEmitter, new Vector3(0.015f, -0.15f, 0.0f), ParticleEmitter.transform.rotation);
+        _emitter.transform.parent = this.transform;
+        //_emitter.enableEmission = true;
+        _emitter.Stop();
+
+        //var newGhost = (Transform)Instantiate(Ghost, new Vector3(0, _camRect.height, 0), Quaternion.identity);
+        //newGhost.parent = transform;
+        //newGhost = (Transform)Instantiate(Ghost, new Vector3(0, -_camRect.height, 0), Quaternion.identity);
+        //newGhost.parent = transform;
+        //newGhost = (Transform)Instantiate(Ghost, new Vector3(_camRect.width, 0, 0), Quaternion.identity);
+        //newGhost.parent = transform;
+        //newGhost = (Transform)Instantiate(Ghost, new Vector3(-_camRect.width, 0, 0), Quaternion.identity);
+        //newGhost.parent = transform;
+
     }
 
     void OnGUI()
     {
-        print(GetFrameRate());
+        //print(GetFrameRate());
     }
 
     // Update is called once per frame
@@ -35,12 +52,31 @@ public class Player : Wrapped2D
         base.InstantAngleChange(horz, AngleIncrement, RotateSpeed);
 
 
-        bool vert = Input.GetButton("Vertical");
-        if (vert )
+        float vert = Input.GetAxisRaw("Vertical");
+        if (vert > 0.0f )
         {
             var rigidBody = GetComponent<Rigidbody2D>();
             rigidBody.AddRelativeForce(Vector2.up * Thrust * Time.deltaTime);
             rigidBody.velocity = Vector2.ClampMagnitude(rigidBody.velocity, MaxSpeed);
+            if (_emitter.isStopped)
+            {
+                _emitter.Play();
+            }
+            //if (!ParticleEmitter.isPlaying)
+            //{
+            //    ParticleEmitter.Play();
+            //}
+        }
+        else
+        {
+            if (_emitter.isPlaying)
+            {
+                _emitter.Stop();
+            }
+            //if (!ParticleEmitter.isStopped)
+            //{
+            //    ParticleEmitter.Stop();
+            //}
         }
 
         WrapScreen();
