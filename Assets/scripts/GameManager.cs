@@ -5,20 +5,28 @@ using Toolbox;
 
 
 // TODO: Leftover explosions?
-// Bullets
-// Breaking up asteroids
-// Next level when all asteroids dead.
+// x Faster asteriods
+// Bullet momemntum to new asteroids.
+// x Bullets
+// x Breaking up asteroids
+// x Next level when all asteroids dead.
 // x Safe create not very safe.
 // Explosion lasts too long.
 // Goofy shaped asteriod.
 // x Gameover not shown at end.
 // x Extra asteroids after each death.
-// Show lives and score.
+// x Show lives and score.
+// x Score goes to zero on new level.
+// Limit bullets.
+// Spawn on edges.
+// Level levelling
+// Alien
+// Free player every 10000
 
 public class GameManager : Singleton<GameManager>
 {
     public int Score = 0;
-    public int Lives = 4;
+    public int Lives = 0;
 
     private enum State
     {
@@ -38,34 +46,35 @@ public class GameManager : Singleton<GameManager>
     [Obsolete]
     public LevelManager LevelManagerPrefab;
 
-    private LevelManager _levelManager;
+    [HideInInspector]
+    public LevelManager LevelManager;
 
 	// Use this for initialization
 	void Awake()
 	{
 	    SceneRoot = this.transform.parent;
-	    _levelManager = Instantiate(LevelManagerPrefab); // TBD: Cleanup.
-	    _levelManager.transform.parent = this.transform.parent;
+	    LevelManager = Instantiate(LevelManagerPrefab); // TBD: Cleanup.
+	    LevelManager.transform.parent = this.transform.parent;
 	}
 
     public void PlayerKilled( Player player)
     {
-        this.Lives--;
-        if (this.Lives < 0)
+        if (this.Lives < 1)
         {
             _state = State.Over;
-            _levelManager.GameOver(player);
+            LevelManager.GameOver(player);
         }
         else
         {
-            _levelManager.Respawn(player);
+            LevelManager.Respawn(player);
+
         }
 
     }
 
     public void LastAsteroidKilled(Player p)
     {
-        _levelManager.StartLevel();
+        LevelManager.StartLevel();
     }
 
     // Update is called once per frame
@@ -76,9 +85,9 @@ public class GameManager : Singleton<GameManager>
 	        if (_state == State.Over)
 	        {
 	            _state = State.Playing;
-	            Lives = 4;
+	            Lives = 2;
 	            Score = 0;
-	            this._levelManager.StartGame();
+	            this.LevelManager.StartGame();
 	        }
 	    }
 

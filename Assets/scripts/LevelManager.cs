@@ -2,8 +2,10 @@
 using UnityEngine;
 using System.Collections;
 using System.Collections.Generic;
+using System.Runtime.InteropServices;
 using System.Runtime.Remoting.Metadata.W3cXsd2001;
 using Toolbox;
+using Object = UnityEngine.Object;
 using Random = UnityEngine.Random;
 
 public class LevelManager : Base2DBehaviour {
@@ -27,7 +29,7 @@ public class LevelManager : Base2DBehaviour {
         _gameOver = Instantiate(GameOverPrefab);
         //_gameOver.transform.position = Vector3.zero; // TBD SPAWN
         _gameOver.transform.rotation = Quaternion.identity;
-        _gameOver.transform.parent = this.transform.parent;
+        _gameOver.transform.parent = GameManager.Instance.SceneRoot;
         _gameOver.gameObject.SetActive(true);
 
 
@@ -84,27 +86,21 @@ public class LevelManager : Base2DBehaviour {
     {
         for (int ii = 0; ii < astCount; ii++)
         {
-            var sizeIdx = Random.Range(0, AsteroidPrefabs.Length);
-            var pos = MakeRandomPos();
-            var spin = Random.Range(10.0f, 50.0f);
-            var force = MakeRandomForce();
-            var newAst = Instantiate(AsteroidPrefabs[sizeIdx]);
-            newAst.transform.localScale = newAst.transform.localScale*4;
-            newAst.transform.position = pos;
-            newAst.transform.rotation = Quaternion.identity;
-            newAst.transform.parent = this.transform.parent.transform.FindChild("AsteroidField");
-            newAst.GetComponent<Rigidbody2D>().AddForce( force);
-            newAst.GetComponent<Rigidbody2D>().AddTorque(spin);
-            newAst.gameObject.SetActive(true);
-
-            //newAst.GetComponent<SpriteRenderer>().sprite.bounds.size = newAst.GetComponent<Rigidbody2D>().transform.localScale = sz;
-            _asteroids.Add(newAst);
+            var pos = MakeSafeRandomPos();
+            AddAsteroidWithSizeAt( Asteroid.Sizes.Large, pos);
         }
+    }
+
+    private Asteroid GetPrefabBySize(Asteroid.Sizes astSize)
+    {
+        return AsteroidPrefabs[(int) astSize];
     }
 
     private Vector2 MakeRandomForce()
     {
-        return new Vector2(Random.Range(-25.0f, 25.0f), Random.Range(-20.0f, 20.0f));
+        var f = new Vector2(Random.Range(-25.0f, 25.0f), Random.Range(-20.0f, 20.0f));
+        f = f * 2.0f;
+        return f;
     }
 
     private Vector3 MakeRandomPos()
@@ -153,8 +149,7 @@ public class LevelManager : Base2DBehaviour {
     public void StartLevel()
     {
         Level++;
-        AddAsteroids(5);
-        ShowGameOver(false);
+        AddAsteroids( (int) (3.0f + Mathf.Log( (float) Level)));
     }
 
     private void ShowGameOver(bool b)
@@ -170,7 +165,51 @@ public class LevelManager : Base2DBehaviour {
     public void Respawn(Player player )
     {
         // TBD: Would be cleaner in a base class.
-        StartCoroutine(CoroutineUtils.DelaySeconds(() => MakeNewPlayer(), 2.0f));
+        StartCoroutine(CoroutineUtils.DelaySeconds(() =>
+        {
+            MakeNewPlayer();
 
+            // Change the count AFTER the respawn occurs. It looks better.
+            GameManager.Instance.Lives--;
+
+        }, 2.0f));
+
+    }
+
+    public void ReplaceAsteroidWith(Asteroid ast, int p1, Asteroid.Sizes astSize)
+    {
+        bool removed = _asteroids.Remove(ast);
+        System.Diagnostics.Debug.Assert(removed);
+
+        for (int ii = 0; ii < p1; ii++)
+        {
+            AddAsteroidWithSizeAt(astSize, ast.transform.position);
+        }
+
+        Destroy(ast.gameObject); // TBD: Explosion & Split asteroid & keep count.
+
+        if (_asteroids.Count == 0)
+        {
+            StartLevel();
+        }
+    }
+
+    private void AddAsteroidWithSizeAt(Asteroid.Sizes astSize, Vector3 pos)
+    {
+        //var astSize = (Asteroid.Sizes)Random.Range(0, AsteroidPrefabs.Length);
+        var spin = Random.Range(10.0f, 50.0f);
+        var force = MakeRandomForce();
+        var prefab = GetPrefabBySize(astSize);
+        var newAst = Instantiate(prefab);
+        newAst.transform.localScale = newAst.transform.localScale * 4;
+        newAst.transform.position = pos;
+        newAst.transform.rotation = Quaternion.identity;
+        newAst.transform.parent = this.transform.parent.transform.FindChild("AsteroidField");
+        newAst.GetComponent<Rigidbody2D>().AddForce(force);
+        newAst.GetComponent<Rigidbody2D>().AddTorque(spin);
+        newAst.gameObject.SetActive(true);
+
+        //newAst.GetComponent<SpriteRenderer>().sprite.bounds.size = newAst.GetComponent<Rigidbody2D>().transform.localScale = sz;
+        _asteroids.Add(newAst);
     }
 }
