@@ -7,6 +7,8 @@ using Toolbox;
 
 public class Player : Wrapped2D
 {
+    public int MAX_BULLETS = 3;
+
     public float RotateSpeed = 100.0f;
     public float Thrust = 100.0f;
     public float AngleIncrement = 5.0f;
@@ -33,11 +35,15 @@ public class Player : Wrapped2D
     }
 
     private State _state;
+    private Transform _bulletsContainer;
 
 
     // Use this for initialization
     public void Start()
     {
+        _bulletsContainer = GameManager.Instance.SceneRoot.FindChild("BulletsContainer");
+        System.Diagnostics.Debug.Assert(_bulletsContainer != null);
+
         _exhaust = Instantiate(ExhaustParticlePrefab);
         _exhaust.transform.parent = this.transform;
         _exhaust.transform.position = this.transform.FindChild("ExhaustExit").transform.position;
@@ -153,14 +159,18 @@ public class Player : Wrapped2D
 
     private void FireBullet()
     {
-        var newBullet = Instantiate(BulletPrefab);
-        newBullet.transform.parent = GameManager.Instance.SceneRoot;
-        newBullet.transform.position = this.transform.FindChild("Muzzle").transform.position;
-        newBullet.transform.rotation = this.transform.rotation;
-        newBullet.transform.localScale = new Vector3(1.0f,1.0f,0);
-        newBullet.GetComponent<Rigidbody2D>().AddRelativeForce(Vector2.up*4.0f, ForceMode2D.Impulse);
-        newBullet.gameObject.SetActive(true);
-        Destroy(newBullet.gameObject, 1.5f);
+
+        if (_bulletsContainer.childCount < MAX_BULLETS)
+        {
+            var newBullet = Instantiate(BulletPrefab);
+            newBullet.transform.parent = _bulletsContainer;
+            newBullet.transform.position = this.transform.FindChild("Muzzle").transform.position;
+            newBullet.transform.rotation = this.transform.rotation;
+            newBullet.transform.localScale = new Vector3(1.0f, 1.0f, 0);
+            newBullet.GetComponent<Rigidbody2D>().AddRelativeForce(Vector2.up*4.0f, ForceMode2D.Impulse);
+            newBullet.gameObject.SetActive(true);
+            Destroy(newBullet.gameObject, 1.5f);
+        }
     }
 
     public void Show(bool b)

@@ -4,24 +4,6 @@ using System.Collections;
 using Toolbox;
 
 
-// TODO: Leftover explosions?
-// x Faster asteriods
-// Bullet momemntum to new asteroids.
-// x Bullets
-// x Breaking up asteroids
-// x Next level when all asteroids dead.
-// x Safe create not very safe.
-// Explosion lasts too long.
-// Goofy shaped asteriod.
-// x Gameover not shown at end.
-// x Extra asteroids after each death.
-// x Show lives and score.
-// x Score goes to zero on new level.
-// Limit bullets.
-// Spawn on edges.
-// Level levelling
-// Alien
-// Free player every 10000
 
 public class GameManager : Singleton<GameManager>
 {
