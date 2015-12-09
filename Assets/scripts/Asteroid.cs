@@ -2,7 +2,10 @@
 using System.Collections;
 using Toolbox;
 
-public class Asteroid : Wrapped2D {
+public class Asteroid : Wrapped2D
+{
+
+    public AudioClip ExplosionSound;
 
     public enum Sizes
     {

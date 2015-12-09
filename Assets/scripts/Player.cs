@@ -14,19 +14,22 @@ public class Player : Wrapped2D
     public float AngleIncrement = 5.0f;
     public float MaxSpeed = 50.0f;
     public int PlayerIndex = 0; // Or 1, for 2 players.
-    [Obsolete]
+
+    public AudioClip ExplosionSound;
+    public AudioClip ThrustSound;
+    public AudioClip ShootSound;
+
     public ParticleSystem ExhaustParticlePrefab;
-    [Obsolete]
     public ParticleSystem ExplosionParticlePrefab;
-    [Obsolete]
     public Transform GhostPrefab;
 
-    [Obsolete]
     public Bullet BulletPrefab;
 
     //private Transform[] Ghosts = new Transform[4];
     private ParticleSystem _exhaust;
     private ParticleSystem _explosion;
+
+    private AudioSource _thrustAudioSource;
 
     private enum State
     {
@@ -41,6 +44,8 @@ public class Player : Wrapped2D
     // Use this for initialization
     public void Start()
     {
+        _thrustAudioSource = GetComponent<AudioSource>();
+
         _bulletsContainer = GameManager.Instance.SceneRoot.FindChild("BulletsContainer");
         System.Diagnostics.Debug.Assert(_bulletsContainer != null);
 
@@ -96,6 +101,7 @@ public class Player : Wrapped2D
         _explosion.Play();
         GetComponent<Rigidbody2D>().velocity *= 0.5f; // Slow down when killed.
         GameManager.Instance.PlayerKilled(this);
+        GameManager.Instance.PlayClip(ExplosionSound);
         Destroy(this.gameObject, _explosion.duration + 0.5f); 
     }
 
@@ -135,6 +141,8 @@ public class Player : Wrapped2D
                 rigidBody.velocity = Vector2.ClampMagnitude(rigidBody.velocity, MaxSpeed);
                 if (_exhaust.isStopped)
                 {
+                    _thrustAudioSource.loop = true;
+                    _thrustAudioSource.Play();
                     _exhaust.Play();
                 }
             }
@@ -142,6 +150,7 @@ public class Player : Wrapped2D
             {
                 if (_exhaust.isPlaying)
                 {
+                    _thrustAudioSource.Stop();
                     _exhaust.Stop();
                 }
             }
@@ -169,6 +178,8 @@ public class Player : Wrapped2D
             newBullet.transform.localScale = new Vector3(1.0f, 1.0f, 0);
             newBullet.GetComponent<Rigidbody2D>().AddRelativeForce(Vector2.up*4.0f, ForceMode2D.Impulse);
             newBullet.gameObject.SetActive(true);
+
+            GameManager.Instance.PlayClip(ShootSound);
             Destroy(newBullet.gameObject, 1.5f);
         }
     }

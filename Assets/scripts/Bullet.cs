@@ -1,18 +1,19 @@
 ﻿using System;
 using UnityEngine;
 using System.Collections;
+using Toolbox;
 
 public class Bullet : Wrapped2D {
 
-	// Use this for initialization
+    // Use this for initialization
 	void Start () {
 	
 	}
 	
 	// Update is called once per frame
-	void Update ()
-	{
-	    WrapScreen();
+    void Update()
+    {
+        WrapScreen();
 	}
 
     void OnTriggerEnter2D(Collider2D other)
@@ -20,6 +21,9 @@ public class Bullet : Wrapped2D {
         if (other.gameObject.name.StartsWith("Asteroid")) // TBD: Improve.
         {
             Asteroid ast = other.gameObject.GetComponent<Asteroid>(); // This is great. I can get associated script object for asteroid.
+
+            GameManager.Instance.PlayClip(ast.ExplosionSound);
+
 
             if (ast.Size == Asteroid.Sizes.Large)
             {

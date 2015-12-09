@@ -11,14 +11,11 @@ using Random = UnityEngine.Random;
 public class LevelManager : Base2DBehaviour {
 
     public int Level { get; set; }
-    [Obsolete]
     public Asteroid[] AsteroidPrefabs;
-    [Obsolete]
     public GameObject AlienPrefab; // TBD
-    [Obsolete]
     public Player PlayerPrefab;
-    [Obsolete]
     public GameOver GameOverPrefab;
+    public ParticleSystem AsteroidExplosionParticlePrefab;
 
     private GameOver _gameOver;
     private Player _player1;
@@ -196,6 +193,8 @@ public class LevelManager : Base2DBehaviour {
         bool removed = _asteroids.Remove(ast);
         System.Diagnostics.Debug.Assert(removed);
 
+        CreateAsteroidExplosion(ast); // TBD: Maybe put sound here, too.
+
         for (int ii = 0; ii < p1; ii++)
         {
             var newAst = AddAsteroidWithSizeAt(astSize, ast.transform.position);
@@ -210,7 +209,7 @@ public class LevelManager : Base2DBehaviour {
             //rigid.AddRelativeForce( rigid.velocity * 0.05f, ForceMode2D.Impulse);
         }
 
-        Destroy(ast.gameObject); // TBD: Explosion & Split asteroid & keep count.
+        Destroy(ast.gameObject); // TBD: ExplosionSound & Split asteroid & keep count.
 
         if (_asteroids.Count == 0)
         {
@@ -236,6 +235,18 @@ public class LevelManager : Base2DBehaviour {
         //newAst.GetComponent<SpriteRenderer>().sprite.bounds.size = newAst.GetComponent<Rigidbody2D>().transform.localScale = sz;
         _asteroids.Add(newAst);
         return newAst;
+    }
+
+    private void CreateAsteroidExplosion(Asteroid ast)
+    {
+        var explosion = Instantiate(AsteroidExplosionParticlePrefab);
+        explosion.transform.parent = this.transform.parent.transform.FindChild("AsteroidField");
+        explosion.transform.position = ast.transform.position;
+        explosion.transform.rotation = this.transform.rotation;
+        //_exhaust.enableEmission = true;
+        explosion.Play();
+        DestroyObject( explosion, explosion.duration + 0.25f);
+
     }
 
 }

@@ -25,7 +25,6 @@ public class GameManager : Singleton<GameManager>
 
     internal Transform SceneRoot;
 
-    [Obsolete]
     public LevelManager LevelManagerPrefab;
 
     [HideInInspector]
@@ -38,6 +37,12 @@ public class GameManager : Singleton<GameManager>
 	    LevelManager = Instantiate(LevelManagerPrefab); // TBD: Cleanup.
 	    LevelManager.transform.parent = this.transform.parent;
 	}
+
+    // Safer to play sounds on the game object, since bullets or or asteroids may get destroyed while sound is playing???
+    public void PlayClip(AudioClip clip)
+    {
+        GetComponent<AudioSource>().PlayOneShot(clip, 1.0f);
+    }
 
     public void PlayerKilled( Player player)
     {

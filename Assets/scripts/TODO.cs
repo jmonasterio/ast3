@@ -1,11 +1,12 @@
 ﻿
 // TODO:
+// Sound
 // x Safe is not safe. 
 // Small asteroids too big.
 // Better shape for spacehip.
 // Hyperspace
 // Bullet momemntum to new asteroids.
-// Explosion lasts too long.
+// ExplosionSound lasts too long.
 // Goofy shaped asteriod.
 // x Limit bullets.
 // Spawn on edges.
