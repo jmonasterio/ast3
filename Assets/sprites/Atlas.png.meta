@@ -1,6 +1,6 @@
 fileFormatVersion: 2
 guid: fd99737a6c52cf94e8c82c762a43baf5
-timeCreated: 1449454713
+timeCreated: 1449684249
 licenseType: Free
 TextureImporter:
   fileIDToRecycleName:
@@ -67,42 +67,42 @@ TextureImporter:
     - name: Atlas_0
       rect:
         serializedVersion: 2
-        x: 2
-        y: 98
-        width: 28
-        height: 29
+        x: 3
+        y: 93
+        width: 27
+        height: 31
       alignment: 0
-      pivot: {x: 0, y: 0}
+      pivot: {x: .5, y: .5}
       border: {x: 0, y: 0, z: 0, w: 0}
     - name: Atlas_1
       rect:
         serializedVersion: 2
-        x: 34
-        y: 114
-        width: 10
-        height: 11
+        x: 30
+        y: 113
+        width: 13
+        height: 12
       alignment: 0
-      pivot: {x: 0, y: 0}
+      pivot: {x: .5, y: .5}
       border: {x: 0, y: 0, z: 0, w: 0}
     - name: Atlas_2
       rect:
         serializedVersion: 2
-        x: 66
-        y: 104
-        width: 21
+        x: 47
+        y: 103
+        width: 25
         height: 23
       alignment: 0
-      pivot: {x: 0, y: 0}
+      pivot: {x: .5, y: .5}
       border: {x: 0, y: 0, z: 0, w: 0}
     - name: Atlas_3
       rect:
         serializedVersion: 2
-        x: 98
-        y: 100
-        width: 28
-        height: 26
+        x: 83
+        y: 87
+        width: 43
+        height: 38
       alignment: 0
-      pivot: {x: 0, y: 0}
+      pivot: {x: .5, y: .5}
       border: {x: 0, y: 0, z: 0, w: 0}
     - name: Atlas_4
       rect:
@@ -112,7 +112,7 @@ TextureImporter:
         width: 5
         height: 5
       alignment: 0
-      pivot: {x: 0, y: 0}
+      pivot: {x: .5, y: .5}
       border: {x: 0, y: 0, z: 0, w: 0}
   spritePackingTag: 
   userData: 

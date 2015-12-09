@@ -225,7 +225,7 @@ public class LevelManager : Base2DBehaviour {
         var force = MakeRandomForce();
         var prefab = GetPrefabBySize(astSize);
         var newAst = Instantiate(prefab);
-        newAst.transform.localScale = newAst.transform.localScale * 4;
+        newAst.transform.localScale = newAst.transform.localScale * 3; // Original graphics were too tiny.
         newAst.transform.position = pos;
         newAst.transform.rotation = Quaternion.identity;
         newAst.transform.parent = this.transform.parent.transform.FindChild("AsteroidField");
@@ -237,4 +237,5 @@ public class LevelManager : Base2DBehaviour {
         _asteroids.Add(newAst);
         return newAst;
     }
+
 }

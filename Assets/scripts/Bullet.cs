@@ -30,7 +30,7 @@ public class Bullet : Wrapped2D {
             else if (ast.Size == Asteroid.Sizes.Medium)
             {
                 // Create 2 new smalls.
-                GameManager.Instance.LevelManager.ReplaceAsteroidWith(ast, 2, Asteroid.Sizes.Small, this);
+                GameManager.Instance.LevelManager.ReplaceAsteroidWith(ast, 3, Asteroid.Sizes.Small, this);
                 GameManager.Instance.Score += 20;
             }
             else if (ast.Size == Asteroid.Sizes.Small)

@@ -1,6 +1,8 @@
 ﻿
 // TODO:
-// Safe is not safe. 
+// x Safe is not safe. 
+// Small asteroids too big.
+// Better shape for spacehip.
 // Hyperspace
 // Bullet momemntum to new asteroids.
 // Explosion lasts too long.
