@@ -52,7 +52,8 @@ public class Player : Wrapped2D
         _exhaust = Instantiate(ExhaustParticlePrefab);
         _exhaust.transform.parent = this.transform;
         _exhaust.transform.position = this.transform.FindChild("ExhaustExit").transform.position;
-        _exhaust.transform.rotation = this.transform.rotation;
+        //_exhaust.transform.rotation = this.transform.rotation;
+        //_exhaust.transform.RotateAround( transform.position, transform.up, 180.0f);
         //_exhaust.enableEmission = true;
         _exhaust.Stop();
 

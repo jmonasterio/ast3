@@ -1,11 +1,6 @@
-﻿using System;
-using UnityEngine;
-using System.Collections;
+﻿using UnityEngine;
 using System.Collections.Generic;
-using System.Runtime.InteropServices;
-using System.Runtime.Remoting.Metadata.W3cXsd2001;
 using Toolbox;
-using Object = UnityEngine.Object;
 using Random = UnityEngine.Random;
 
 public class LevelManager : Base2DBehaviour {
