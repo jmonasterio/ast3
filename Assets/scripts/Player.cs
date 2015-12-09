@@ -18,6 +18,10 @@ public class Player : Wrapped2D
     public ParticleSystem ExplosionParticlePrefab;
     [Obsolete]
     public Transform GhostPrefab;
+
+    [Obsolete]
+    public Bullet BulletPrefab;
+
     //private Transform[] Ghosts = new Transform[4];
     private ParticleSystem _exhaust;
     private ParticleSystem _explosion;
@@ -76,6 +80,10 @@ public class Player : Wrapped2D
             // Avoid collision with self.
             return;
         }
+        if (other.gameObject.name.StartsWith("Bullet")) // TBD: Improve.
+        {
+            return; // 
+        }
         _state = State.Killed;
         Show(false);
         _exhaust.Stop();
@@ -131,10 +139,28 @@ public class Player : Wrapped2D
                     _exhaust.Stop();
                 }
             }
+
+            bool firePressed = Input.GetButtonDown("Fire1") || Input.GetButtonDown("Jump");
+            if(firePressed)
+            {
+                FireBullet();
+            }
         }
 
         // Always run this, so even explosions wrap.
         WrapScreen();
+    }
+
+    private void FireBullet()
+    {
+        var newBullet = Instantiate(BulletPrefab);
+        newBullet.transform.parent = GameManager.Instance.SceneRoot;
+        newBullet.transform.position = this.transform.FindChild("Muzzle").transform.position;
+        newBullet.transform.rotation = this.transform.rotation;
+        newBullet.transform.localScale = new Vector3(1.0f,1.0f,0);
+        newBullet.GetComponent<Rigidbody2D>().AddRelativeForce(Vector2.up*4.0f, ForceMode2D.Impulse);
+        newBullet.gameObject.SetActive(true);
+        Destroy(newBullet.gameObject, 1.5f);
     }
 
     public void Show(bool b)

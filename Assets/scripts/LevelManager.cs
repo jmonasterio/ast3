@@ -25,8 +25,9 @@ public class LevelManager : Base2DBehaviour {
     // Use this for initialization
     void Start () {
         _gameOver = Instantiate(GameOverPrefab);
-        _gameOver.transform.position = Vector3.zero; // TBD SPAWN
+        //_gameOver.transform.position = Vector3.zero; // TBD SPAWN
         _gameOver.transform.rotation = Quaternion.identity;
+        _gameOver.transform.parent = this.transform.parent;
         _gameOver.gameObject.SetActive(true);
 
 
@@ -75,6 +76,7 @@ public class LevelManager : Base2DBehaviour {
         _player1.GetComponent<Rigidbody2D>().gravityScale = 0.0f; // Turn off gravity.
         _player1.transform.position = MakeSafeRandomPos();
         _player1.transform.rotation = Quaternion.identity;
+        _player1.transform.parent = GameManager.Instance.SceneRoot;
         _player1.gameObject.SetActive(true);
     }
 
@@ -90,7 +92,7 @@ public class LevelManager : Base2DBehaviour {
             newAst.transform.localScale = newAst.transform.localScale*4;
             newAst.transform.position = pos;
             newAst.transform.rotation = Quaternion.identity;
-            newAst.transform.parent = AsteroidPrefabs[sizeIdx].transform.parent;
+            newAst.transform.parent = this.transform.parent.transform.FindChild("AsteroidField");
             newAst.GetComponent<Rigidbody2D>().AddForce( force);
             newAst.GetComponent<Rigidbody2D>().AddTorque(spin);
             newAst.gameObject.SetActive(true);

@@ -13,6 +13,7 @@ using Toolbox;
 // Goofy shaped asteriod.
 // x Gameover not shown at end.
 // x Extra asteroids after each death.
+// Show lives and score.
 
 public class GameManager : Singleton<GameManager>
 {
@@ -32,15 +33,19 @@ public class GameManager : Singleton<GameManager>
         get { return Instance; }
     }
 
+    internal Transform SceneRoot;
+
     [Obsolete]
     public LevelManager LevelManagerPrefab;
 
     private LevelManager _levelManager;
 
 	// Use this for initialization
-	void Awake() 
+	void Awake()
 	{
+	    SceneRoot = this.transform.parent;
 	    _levelManager = Instantiate(LevelManagerPrefab); // TBD: Cleanup.
+	    _levelManager.transform.parent = this.transform.parent;
 	}
 
     public void PlayerKilled( Player player)
