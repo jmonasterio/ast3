@@ -1,63 +1,83 @@
-﻿using UnityEngine;
+﻿using System;
+using UnityEngine;
 using System.Collections;
 using Toolbox;
 
+
+// TODO: Leftover explosions?
+// Bullets
+// Breaking up asteroids
+// Next level when all asteroids dead.
+// x Safe create not very safe.
+// Explosion lasts too long.
+// Goofy shaped asteriod.
+// x Gameover not shown at end.
+// x Extra asteroids after each death.
+
 public class GameManager : Singleton<GameManager>
 {
+    public int Score = 0;
+    public int Lives = 4;
+
+    private enum State
+    {
+        Playing = 0,
+        Over = 1
+    }
+
+    private State _state = State.Over;
 
     public static GameManager Current
     {
-        get { return Instance as GameManager; }
+        get { return Instance; }
     }
 
+    [Obsolete]
     public LevelManager LevelManagerPrefab;
 
-    public class PlayerInfo 
-    {
-        public int Score;
-        public int Lives;
-    }
-
-    public PlayerInfo[] PlayersInfo; // = new PlayerInfo[2];
+    private LevelManager _levelManager;
 
 	// Use this for initialization
 	void Awake() 
 	{
-	    if ((PlayersInfo == null) || (PlayersInfo.Length == 0))
-	    {
-	        PlayersInfo = new PlayerInfo[2];
-            PlayersInfo[0] = new PlayerInfo();
-	        PlayersInfo[1] = new PlayerInfo();
-	    }
-	    foreach (var playerInfo in PlayersInfo)
-	    {
-	        playerInfo.Score = 0;
-	        playerInfo.Lives = 4;
-	    }
-
-        this.LevelManagerPrefab.StartGame();
-	    this.LevelManagerPrefab.StartLevel();
+	    _levelManager = Instantiate(LevelManagerPrefab); // TBD: Cleanup.
 	}
 
     public void PlayerKilled( Player player)
     {
-        int playerIdx = player.PlayerIndex;
-        var playerInfo = PlayersInfo[playerIdx];
-        this.LevelManagerPrefab.PlayerKilled(playerInfo);
-        playerInfo.Lives--;
-        if (playerInfo.Lives < 0)
+        this.Lives--;
+        if (this.Lives < 0)
         {
-            LevelManagerPrefab.GameOver(playerInfo);
+            _state = State.Over;
+            _levelManager.GameOver(player);
         }
         else
         {
-            LevelManagerPrefab.Respawn(playerInfo);
+            _levelManager.Respawn(player);
         }
 
     }
 
+    public void LastAsteroidKilled(Player p)
+    {
+        _levelManager.StartLevel();
+    }
+
     // Update is called once per frame
 	void Update () {
-        Instance.TickFrameRate();
+
+	    if (Input.GetButton("Fire1"))
+	    {
+	        if (_state == State.Over)
+	        {
+	            _state = State.Playing;
+	            Lives = 4;
+	            Score = 0;
+	            this._levelManager.StartGame();
+	        }
+	    }
+
+
+	    Instance.TickFrameRate();
     }
 }

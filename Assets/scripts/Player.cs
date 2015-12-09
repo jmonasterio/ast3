@@ -1,18 +1,22 @@
-﻿using System.Collections;
+﻿using System;
+using System.Collections;
 using System.Collections.Generic;
+using System.Security.Cryptography.X509Certificates;
 using UnityEngine;
 using Toolbox;
 
 public class Player : Wrapped2D
 {
-
     public float RotateSpeed = 100.0f;
     public float Thrust = 100.0f;
     public float AngleIncrement = 5.0f;
     public float MaxSpeed = 50.0f;
     public int PlayerIndex = 0; // Or 1, for 2 players.
+    [Obsolete]
     public ParticleSystem ExhaustParticlePrefab;
+    [Obsolete]
     public ParticleSystem ExplosionParticlePrefab;
+    [Obsolete]
     public Transform GhostPrefab;
     //private Transform[] Ghosts = new Transform[4];
     private ParticleSystem _exhaust;
@@ -32,15 +36,15 @@ public class Player : Wrapped2D
     {
         _exhaust = Instantiate(ExhaustParticlePrefab);
         _exhaust.transform.parent = this.transform;
-        _exhaust.transform.position = ExhaustParticlePrefab.transform.position; //new Vector3(0.015f, -0.15f, 0.0f);
-        _exhaust.transform.rotation = ExhaustParticlePrefab.transform.rotation;
+        _exhaust.transform.position = this.transform.FindChild("ExhaustExit").transform.position;
+        _exhaust.transform.rotation = this.transform.rotation;
         //_exhaust.enableEmission = true;
         _exhaust.Stop();
 
         _explosion = Instantiate(ExplosionParticlePrefab);
         _explosion.transform.parent = this.transform;
-        _explosion.transform.position = ExhaustParticlePrefab.transform.position; //new Vector3(0.015f, -0.15f, 0.0f);
-        _explosion.transform.rotation = ExhaustParticlePrefab.transform.rotation;
+        _explosion.transform.position = this.transform.position; //new Vector3(0.015f, -0.15f, 0.0f);
+        _explosion.transform.rotation = this.transform.rotation;
         _explosion.loop = false;
         _explosion.Stop();
 
@@ -67,75 +71,69 @@ public class Player : Wrapped2D
         {
             return;
         }
+        if (other.GetInstanceID() == this.GetInstanceID())
+        {
+            // Avoid collision with self.
+            return;
+        }
         _state = State.Killed;
         Show(false);
         _exhaust.Stop();
         _explosion.Play();
-        StartCoroutine(DestroyPlayerLater());
+        GetComponent<Rigidbody2D>().velocity *= 0.5f; // Slow down when killed.
         GameManager.Instance.PlayerKilled(this);
+        Destroy(this.gameObject, _explosion.duration + 0.5f); 
     }
 
-    private IEnumerator DestroyPlayerLater()
+    void OnDestroy()
     {
-        yield return new WaitForSeconds(1.0f);
-
-        SafeDestroy( ref _explosion);
+        // Cleanup
+        if (_exhaust != null)
+        {
+            _exhaust.Stop();
+        }
+        if (_explosion != null)
+        {
+            _explosion.Stop();
+        }
         SafeDestroy( ref _exhaust);
-        Destroy(this);
-    }
-
-    void SafeDestroy(ref Component obj)
-    {
-        if (obj != null)
-        {
-        }
-        Destroy( obj);
-        obj = null;
-    }
-
-    void SafeDestroy(ref ParticleSystem obj)
-    {
-        if (obj != null)
-        {
-        }
-        Destroy(obj);
-        obj = null;
+        SafeDestroy( ref _explosion);
     }
 
     // Update is called once per frame
     void Update ()
     {
-        if (_state == State.Killed)
+        if (_state != State.Killed)
         {
-            return;
-        }
 
-        //base.DebugForceSinusoidalFrameRate();
+            //base.DebugForceSinusoidalFrameRate();
 
-        float horz = Input.GetAxisRaw("Horizontal");
+            float horz = Input.GetAxisRaw("Horizontal");
 
-        base.InstantAngleChange(horz, AngleIncrement, RotateSpeed);
+            base.InstantAngleChange(horz, AngleIncrement, RotateSpeed);
 
 
-        float vert = Input.GetAxisRaw("Vertical");
-        if (vert > 0.0f )
-        {
-            var rigidBody = GetComponent<Rigidbody2D>();
-            rigidBody.AddRelativeForce(Vector2.up * Thrust * Time.deltaTime);
-            rigidBody.velocity = Vector2.ClampMagnitude(rigidBody.velocity, MaxSpeed);
-            if (_exhaust.isStopped)
+            float vert = Input.GetAxisRaw("Vertical");
+            if (vert > 0.0f)
             {
-                _exhaust.Play();
+                var rigidBody = GetComponent<Rigidbody2D>();
+                rigidBody.AddRelativeForce(Vector2.up*Thrust*Time.deltaTime);
+                rigidBody.velocity = Vector2.ClampMagnitude(rigidBody.velocity, MaxSpeed);
+                if (_exhaust.isStopped)
+                {
+                    _exhaust.Play();
+                }
+            }
+            else
+            {
+                if (_exhaust.isPlaying)
+                {
+                    _exhaust.Stop();
+                }
             }
         }
-        else
-        {
-            if (_exhaust.isPlaying)
-            {
-                _exhaust.Stop();
-            }
-        }
 
+        // Always run this, so even explosions wrap.
         WrapScreen();
     }
 
