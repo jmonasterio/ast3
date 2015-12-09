@@ -6,6 +6,7 @@
 // Level levelling
 // Alien
 // Free player every 10000
+// Blink ships on change.
 // x Goofy shaped asteriod.
 // x Sound
 // x Safe is not safe. 

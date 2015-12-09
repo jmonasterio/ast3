@@ -14,7 +14,10 @@ public class LevelManager : Base2DBehaviour {
     public ParticleSystem AsteroidExplosionParticlePrefab;
     public AudioClip Jaws1;
     public AudioClip Jaws2;
+    public AudioClip FreeLifeSound;
+    
 
+    private int _nextFreeLifeScore;
 
     private GameOver _gameOver;
     private Player _player1;
@@ -23,6 +26,7 @@ public class LevelManager : Base2DBehaviour {
     private DateTime _nextJawsSoundTime;
     private int _jawsIntervalMs;
     private bool _jawsAlternate;
+
 
 
     // Use this for initialization
@@ -38,6 +42,13 @@ public class LevelManager : Base2DBehaviour {
     // Update is called once per frame
     void Update ()
 	{
+        if (GameManager.Instance.Score > _nextFreeLifeScore)
+        {
+            GameManager.Instance.Lives++;
+            _nextFreeLifeScore += 1000;
+            GameManager.Instance.PlayClip(FreeLifeSound);
+        }
+
         if (DateTime.Now > _nextJawsSoundTime)
         {
             if (_player1 != null) // Means we're in level
@@ -86,6 +97,8 @@ public class LevelManager : Base2DBehaviour {
     public void StartGame()
     {
         Level = 0;
+        _nextFreeLifeScore = 1000;
+
         ShowGameOver(false);
         MakeNewPlayer();
         ClearAsteroids();
