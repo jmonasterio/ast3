@@ -86,7 +86,7 @@ public class LevelManager : Base2DBehaviour {
     {
         for (int ii = 0; ii < astCount; ii++)
         {
-            var pos = MakeSafeRandomPos();
+            var pos = MakeSafeAsteroidPos();
             AddAsteroidWithSizeAt( Asteroid.Sizes.Large, pos);
         }
     }
@@ -146,6 +146,21 @@ public class LevelManager : Base2DBehaviour {
 
     }
 
+    private Vector3 MakeSafeAsteroidPos()
+    {
+        var playerPos = _player1.transform.position;
+        for (int ii = 1; ii < 1000; ii++)
+        {
+            var astPos = MakeRandomPos();
+            if (Vector3.Distance(astPos, playerPos) > 2.0)
+            {
+                return astPos;
+            }
+        }
+        return MakeRandomPos();
+
+    }
+
     public void StartLevel()
     {
         Level++;
@@ -176,14 +191,23 @@ public class LevelManager : Base2DBehaviour {
 
     }
 
-    public void ReplaceAsteroidWith(Asteroid ast, int p1, Asteroid.Sizes astSize)
+    public void ReplaceAsteroidWith(Asteroid ast, int p1, Asteroid.Sizes astSize, Bullet bullet)
     {
         bool removed = _asteroids.Remove(ast);
         System.Diagnostics.Debug.Assert(removed);
 
         for (int ii = 0; ii < p1; ii++)
         {
-            AddAsteroidWithSizeAt(astSize, ast.transform.position);
+            var newAst = AddAsteroidWithSizeAt(astSize, ast.transform.position);
+
+            // Give some momentum from the bullet.
+            var rigid = newAst.GetComponent<Rigidbody2D>();
+            var bulletVelocity = bullet.GetComponent<Rigidbody2D>().velocity;
+            var f = bulletVelocity.normalized*Random.Range(0.05f, 0.2f);
+            rigid.AddRelativeForce( f, ForceMode2D.Impulse );
+
+            // Speed up smaller ones
+            //rigid.AddRelativeForce( rigid.velocity * 0.05f, ForceMode2D.Impulse);
         }
 
         Destroy(ast.gameObject); // TBD: Explosion & Split asteroid & keep count.
@@ -194,7 +218,7 @@ public class LevelManager : Base2DBehaviour {
         }
     }
 
-    private void AddAsteroidWithSizeAt(Asteroid.Sizes astSize, Vector3 pos)
+    private Asteroid AddAsteroidWithSizeAt(Asteroid.Sizes astSize, Vector3 pos)
     {
         //var astSize = (Asteroid.Sizes)Random.Range(0, AsteroidPrefabs.Length);
         var spin = Random.Range(10.0f, 50.0f);
@@ -211,5 +235,6 @@ public class LevelManager : Base2DBehaviour {
 
         //newAst.GetComponent<SpriteRenderer>().sprite.bounds.size = newAst.GetComponent<Rigidbody2D>().transform.localScale = sz;
         _asteroids.Add(newAst);
+        return newAst;
     }
 }

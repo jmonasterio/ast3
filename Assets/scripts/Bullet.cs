@@ -24,18 +24,18 @@ public class Bullet : Wrapped2D {
             if (ast.Size == Asteroid.Sizes.Large)
             {
                 // Create 2 new mediumes
-                GameManager.Instance.LevelManager.ReplaceAsteroidWith(ast, 2, Asteroid.Sizes.Medium);
+                GameManager.Instance.LevelManager.ReplaceAsteroidWith(ast, 2, Asteroid.Sizes.Medium, this);
                 GameManager.Instance.Score += 10;
             }
             else if (ast.Size == Asteroid.Sizes.Medium)
             {
                 // Create 2 new smalls.
-                GameManager.Instance.LevelManager.ReplaceAsteroidWith(ast, 2, Asteroid.Sizes.Small);
+                GameManager.Instance.LevelManager.ReplaceAsteroidWith(ast, 2, Asteroid.Sizes.Small, this);
                 GameManager.Instance.Score += 20;
             }
             else if (ast.Size == Asteroid.Sizes.Small)
             {
-                GameManager.Instance.LevelManager.ReplaceAsteroidWith(ast, 0, Asteroid.Sizes.Small); // Size does not matter.
+                GameManager.Instance.LevelManager.ReplaceAsteroidWith(ast, 0, Asteroid.Sizes.Small, this); // Size does not matter.
                 GameManager.Instance.Score += 30;
             }
             else

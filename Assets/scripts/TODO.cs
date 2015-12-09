@@ -1,14 +1,16 @@
 ﻿
 // TODO:
+// Safe is not safe. 
+// Hyperspace
 // Bullet momemntum to new asteroids.
 // Explosion lasts too long.
 // Goofy shaped asteriod.
-// Limit bullets.
+// x Limit bullets.
 // Spawn on edges.
 // Level levelling
 // Alien
 // Free player every 10000
-// xLeftover explosions?
+// x Leftover explosions?
 // x Faster asteriods
 // x Bullets
 // x Breaking up asteroids
