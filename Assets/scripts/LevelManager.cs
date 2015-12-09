@@ -1,4 +1,5 @@
-﻿using UnityEngine;
+﻿using System;
+using UnityEngine;
 using System.Collections.Generic;
 using Toolbox;
 using Random = UnityEngine.Random;
@@ -11,10 +12,18 @@ public class LevelManager : Base2DBehaviour {
     public Player PlayerPrefab;
     public GameOver GameOverPrefab;
     public ParticleSystem AsteroidExplosionParticlePrefab;
+    public AudioClip Jaws1;
+    public AudioClip Jaws2;
+
 
     private GameOver _gameOver;
     private Player _player1;
     private List<Asteroid> _asteroids = new List<Asteroid>();
+
+    private DateTime _nextJawsSoundTime;
+    private int _jawsIntervalMs;
+    private bool _jawsAlternate;
+
 
     // Use this for initialization
     void Start () {
@@ -24,12 +33,32 @@ public class LevelManager : Base2DBehaviour {
         _gameOver.transform.parent = GameManager.Instance.SceneRoot;
         _gameOver.gameObject.SetActive(true);
 
-
     }
 
     // Update is called once per frame
     void Update ()
 	{
+        if (DateTime.Now > _nextJawsSoundTime)
+        {
+            if (_player1 != null) // Means we're in level
+            {
+                if (_jawsIntervalMs > 180)
+                {
+                    _jawsIntervalMs -= 5;
+                }
+                _nextJawsSoundTime = DateTime.Now.AddMilliseconds(_jawsIntervalMs);
+                if (_jawsAlternate)
+                {
+                    GameManager.Instance.PlayClip(Jaws1);
+                }
+                else
+                {
+                    GameManager.Instance.PlayClip(Jaws2);
+                }
+                _jawsAlternate = !_jawsAlternate;
+            }
+        }
+
     }
 
     public void OnDestroy()
@@ -72,6 +101,11 @@ public class LevelManager : Base2DBehaviour {
         _player1.transform.rotation = Quaternion.identity;
         _player1.transform.parent = GameManager.Instance.SceneRoot;
         _player1.gameObject.SetActive(true);
+    }
+
+    public void HyperSpace()
+    {
+        _player1.transform.position = MakeRandomPos(); // Not safe on purpose
     }
 
     private void AddAsteroids(int astCount)
@@ -156,6 +190,9 @@ public class LevelManager : Base2DBehaviour {
     public void StartLevel()
     {
         Level++;
+        _jawsIntervalMs = 900;
+        _jawsAlternate = true;
+        _nextJawsSoundTime = DateTime.Now.AddMilliseconds(_jawsIntervalMs);
         AddAsteroids( (int) (3.0f + Mathf.Log( (float) Level)));
     }
 
@@ -166,11 +203,15 @@ public class LevelManager : Base2DBehaviour {
 
     public void GameOver(Player player)
     {
+        _player1 = null;
+
         ShowGameOver(true);
     }
 
     public void Respawn(Player player )
     {
+        _player1 = null;
+
         // TBD: Would be cleaner in a base class.
         StartCoroutine(CoroutineUtils.DelaySeconds(() =>
         {

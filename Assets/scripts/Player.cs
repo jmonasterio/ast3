@@ -161,11 +161,18 @@ public class Player : Wrapped2D
             {
                 FireBullet();
             }
+
+            bool hyperPressed = Input.GetButtonDown("HyperSpace");
+            if( hyperPressed)
+            {
+                GameManager.Instance.LevelManager.HyperSpace();
+            }
         }
 
         // Always run this, so even explosions wrap.
         WrapScreen();
     }
+
 
     private void FireBullet()
     {

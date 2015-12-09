@@ -1,7 +1,7 @@
 ﻿
 // TODO:
-// Hyperspace
-// Background music.
+// x Hyperspace
+// x Background music.
 // Spawn on edges.
 // Level levelling
 // Alien

@@ -30,6 +30,7 @@ public class GameManager : Singleton<GameManager>
     [HideInInspector]
     public LevelManager LevelManager;
 
+
 	// Use this for initialization
 	void Awake()
 	{
