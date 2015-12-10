@@ -78,8 +78,5 @@ public class GameManager : Singleton<GameManager>
 	            this.LevelManager.StartGame();
 	        }
 	    }
-
-
-	    Instance.TickFrameRate();
     }
 }

@@ -62,14 +62,6 @@ namespace Toolbox
     public class Base2DBehaviour : MonoBehaviour
     {
 
-        float _deltaTime = 0.0f;
-
-        public float GetFrameRate()
-        {
-            //float msec = _deltaTime*1000.0f;
-            float fps = 1.0f/_deltaTime;
-            return fps;
-        }
 
         public Rect GetCameraWorldRect()
         {
@@ -93,18 +85,6 @@ namespace Toolbox
             transform.position = new Vector3(v2.x, v2.y, 0.0f);
         }
 
-        /// <summary>
-        /// Call this in the Update() function.
-        /// </summary>
-        public void TickFrameRate()
-        {
-            _deltaTime += (Time.deltaTime - _deltaTime)*0.1f;
-        }
-
-        protected void DebugForceSinusoidalFrameRate()
-        {
-            Application.targetFrameRate = (int) ((Mathf.Sin(Time.time) + 1.05f)*60);
-        }
 
         private float? _instantTargetAngle;
 
