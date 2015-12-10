@@ -5,7 +5,6 @@ using Toolbox;
 
 namespace Assets.Scripts
 {
-
     public class Lives : Base2DBehaviour
     {
 
@@ -14,7 +13,6 @@ namespace Assets.Scripts
         // Use this for initialization
         void Start()
         {
-
         }
 
         // Update is called once per frame
@@ -29,9 +27,10 @@ namespace Assets.Scripts
                 }
                 else
                 {
-                    GetComponent<TextMesh>().text = String.Empty;
+                    GetComponent<TextMesh>().text = string.Empty;
                 }
                 _lives = lives;
+                BlinkText(2.0f, 0.1f, Color.gray);
             }
         }
     }

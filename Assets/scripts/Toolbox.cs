@@ -192,6 +192,31 @@ namespace Toolbox
             obj = null;
         }
 
+        public void BlinkText(float duration, float interval, Color offColor)
+        {
+            StartCoroutine(BlinkTextCoroutine(duration, interval, offColor));
+        }
+
+
+        //function to blink the text 
+        private IEnumerator BlinkTextCoroutine(float duration, float interval, Color offColor)
+        {
+            var textMesh = GetComponent<TextMesh>();
+            var originalColor = textMesh.color;
+            var endTime = Time.time + duration;
+
+            // Blink until duration is over.
+            while (Time.time < endTime)
+            {
+                textMesh.color = offColor;
+                yield return new WaitForSeconds(interval);
+                textMesh.color = originalColor;
+                yield return new WaitForSeconds(interval);
+
+            }
+        }
+
+
 
     }
 

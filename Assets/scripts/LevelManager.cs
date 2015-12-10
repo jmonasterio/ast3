@@ -1,6 +1,7 @@
 ﻿using System;
 using UnityEngine;
 using System.Collections.Generic;
+using Mono.Cecil.Cil;
 using Toolbox;
 using Random = UnityEngine.Random;
 
@@ -11,15 +12,17 @@ public class LevelManager : Base2DBehaviour {
     public GameObject AlienPrefab; // TBD
     public Player PlayerPrefab;
     public GameOver GameOverPrefab;
+    public Instructions InstructionsPrefab;
     public ParticleSystem AsteroidExplosionParticlePrefab;
     public AudioClip Jaws1;
     public AudioClip Jaws2;
     public AudioClip FreeLifeSound;
-    
+    public int FREE_USER_AT = 10000;
 
     private int _nextFreeLifeScore;
 
     private GameOver _gameOver;
+    private Instructions _instructions;
     private Player _player1;
     private List<Asteroid> _asteroids = new List<Asteroid>();
 
@@ -31,12 +34,21 @@ public class LevelManager : Base2DBehaviour {
 
     // Use this for initialization
     void Start () {
+
         _gameOver = Instantiate(GameOverPrefab);
         //_gameOver.transform.position = Vector3.zero; // TBD SPAWN
         _gameOver.transform.rotation = Quaternion.identity;
         _gameOver.transform.parent = GameManager.Instance.SceneRoot;
         _gameOver.gameObject.SetActive(true);
 
+        _instructions = Instantiate(InstructionsPrefab);
+        //_gameOver.transform.position = Vector3.zero; // TBD SPAWN
+        _instructions.transform.rotation = Quaternion.identity;
+        _instructions.transform.parent = GameManager.Instance.SceneRoot;
+        _instructions.gameObject.SetActive(true);
+
+        ShowGameOver(true);
+        ShowInstructions(true);
     }
 
     // Update is called once per frame
@@ -45,7 +57,7 @@ public class LevelManager : Base2DBehaviour {
         if (GameManager.Instance.Score > _nextFreeLifeScore)
         {
             GameManager.Instance.Lives++;
-            _nextFreeLifeScore += 1000;
+            _nextFreeLifeScore += FREE_USER_AT;
             GameManager.Instance.PlayClip(FreeLifeSound);
         }
 
@@ -79,6 +91,14 @@ public class LevelManager : Base2DBehaviour {
             Destroy(_player1.gameObject);
             _player1 = null;
         }
+        if (_instructions != null)
+        {
+            Destroy(_instructions);
+        }
+        if (_gameOver != null)
+        {
+            Destroy(_gameOver);
+        }
         ClearAsteroids();
     }
 
@@ -97,9 +117,12 @@ public class LevelManager : Base2DBehaviour {
     public void StartGame()
     {
         Level = 0;
-        _nextFreeLifeScore = 1000;
+        _nextFreeLifeScore = FREE_USER_AT;
 
         ShowGameOver(false);
+        ShowInstructions(false);
+        
+        ShowInstructions(false);
         MakeNewPlayer();
         ClearAsteroids();
         StartLevel();
@@ -212,6 +235,15 @@ public class LevelManager : Base2DBehaviour {
     private void ShowGameOver(bool b)
     {
         _gameOver.GetComponent<MeshRenderer>().enabled = b;
+        if (b)
+        {
+            _gameOver.BlinkText(2.0f, 0.1f, Color.gray);
+        }
+    }
+
+    private void ShowInstructions(bool b)
+    {
+        _instructions.GetComponent<MeshRenderer>().enabled = b;
     }
 
     public void GameOver(Player player)
@@ -219,6 +251,7 @@ public class LevelManager : Base2DBehaviour {
         _player1 = null;
 
         ShowGameOver(true);
+        ShowInstructions(true);
     }
 
     public void Respawn(Player player )
@@ -233,7 +266,7 @@ public class LevelManager : Base2DBehaviour {
             // Change the count AFTER the respawn occurs. It looks better.
             GameManager.Instance.Lives--;
 
-        }, 2.0f));
+        }, 3));
 
     }
 

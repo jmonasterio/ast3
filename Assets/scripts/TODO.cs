@@ -1,12 +1,13 @@
 ﻿
 // TODO:
-// x Hyperspace
-// x Background music.
 // Spawn on edges.
 // Level levelling
 // Alien
-// Free player every 10000
+// x Free player every 10000
 // Blink ships on change.
+// Blurry asteroids
+// x Hyperspace
+// x Background music.
 // x Goofy shaped asteriod.
 // x Sound
 // x Safe is not safe. 
