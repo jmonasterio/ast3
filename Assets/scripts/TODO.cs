@@ -1,10 +1,11 @@
 ﻿
 // TODO:
+// Sound for thrust is way late.
 // Spawn on edges.
 // Level levelling
 // Alien
 // x Free player every 10000
-// Blink ships on change.
+// x Blink ships on change.
 // Blurry asteroids
 // x Hyperspace
 // x Background music.

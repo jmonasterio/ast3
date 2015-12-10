@@ -54,7 +54,7 @@ public class GameManager : Singleton<GameManager>
         }
         else
         {
-            LevelManager.Respawn(player);
+            LevelManager.Respawn(player, 2.0f);
 
         }
 

@@ -9,7 +9,7 @@ namespace Toolbox
     {
         public static float RoundToNearestMultiple(float f, float multiple)
         {
-            return Mathf.Round(f / multiple) * multiple;
+            return Mathf.Round(f/multiple)*multiple;
         }
     }
 
@@ -24,6 +24,7 @@ namespace Toolbox
          *         CoroutineUtils.WaitForSeconds(2),
          *         CoroutineUtils.Do(() => Debug.Log("B"))));
          */
+
         public static IEnumerator Chain(params IEnumerator[] actions)
         {
             foreach (IEnumerator action in actions)
@@ -39,6 +40,7 @@ namespace Toolbox
          *         () => DebugUtils.Log("2 seconds past"),
          *         2);
          */
+
         public static IEnumerator DelaySeconds(Action action, float delay)
         {
             yield return new WaitForSeconds(delay);
@@ -88,8 +90,8 @@ namespace Toolbox
 
         public void PosFrom2D(Vector2 v2)
         {
-            transform.position = new Vector3( v2.x, v2.y, 0.0f);
-       }
+            transform.position = new Vector3(v2.x, v2.y, 0.0f);
+        }
 
         /// <summary>
         /// Call this in the Update() function.
@@ -120,12 +122,12 @@ namespace Toolbox
                 var dir = -Mathf.Sign(horz);
                 if (dir != 0.0f)
                 {
-                    float angleToRotate = dir * rotateSpeed * Time.deltaTime;
+                    float angleToRotate = dir*rotateSpeed*Time.deltaTime;
                     var targetAngle = curAngle + angleToRotate;
                     transform.Rotate(0.0f, 0.0f, targetAngle - curAngle);
 
                     // In case we have to stop.
-                    _instantTargetAngle = MathfExt.RoundToNearestMultiple(targetAngle + dir * angleIncrement,
+                    _instantTargetAngle = MathfExt.RoundToNearestMultiple(targetAngle + dir*angleIncrement,
                         angleIncrement);
                 }
 
@@ -134,7 +136,8 @@ namespace Toolbox
             {
                 if (_instantTargetAngle.HasValue)
                 {
-                    var newAngle = Mathf.MoveTowardsAngle(curAngle, _instantTargetAngle.Value, rotateSpeed*Time.deltaTime);
+                    var newAngle = Mathf.MoveTowardsAngle(curAngle, _instantTargetAngle.Value,
+                        rotateSpeed*Time.deltaTime);
                     transform.Rotate(0.0f, 0.0f, newAngle - curAngle);
 
                     if (newAngle == curAngle)
@@ -149,18 +152,19 @@ namespace Toolbox
         }
 
         float _smoothTargetAngle;
-        protected void SmoothAngleChange( float horz, float angleIncrement, float rotateSpeed)
+
+        protected void SmoothAngleChange(float horz, float angleIncrement, float rotateSpeed)
         {
             var curAngle = transform.eulerAngles.z;
             if (horz != 0.0f)
             {
                 // Time factored in later.
-                float angleToRotate = -Mathf.Sign(horz) * angleIncrement;
+                float angleToRotate = -Mathf.Sign(horz)*angleIncrement;
                 _smoothTargetAngle = MathfExt.RoundToNearestMultiple(curAngle + angleToRotate, angleIncrement);
             }
             if (0.0f != Mathf.DeltaAngle(_smoothTargetAngle, curAngle))
             {
-                var newAngle = Mathf.MoveTowardsAngle(curAngle, _smoothTargetAngle, rotateSpeed * Time.deltaTime);
+                var newAngle = Mathf.MoveTowardsAngle(curAngle, _smoothTargetAngle, rotateSpeed*Time.deltaTime);
                 transform.Rotate(0.0f, 0.0f, newAngle - curAngle);
             }
         }
@@ -217,16 +221,44 @@ namespace Toolbox
         }
 
 
+        public void BlinkSprite(float duration, float interval)
+        {
+            StartCoroutine(BlinkSpriteCoroutine(duration, interval));
+        }
 
+
+        //function to blink the text 
+        private IEnumerator BlinkSpriteCoroutine(float duration, float interval)
+        {
+            var sprite = GetComponent<SpriteRenderer>();
+            var originalEnabled = sprite.enabled;
+            var endTime = Time.time + duration;
+
+            // Blink until duration is over.
+            while (Time.time < endTime)
+            {
+                sprite.enabled = !originalEnabled;
+                yield return new WaitForSeconds(interval);
+                sprite.enabled = originalEnabled;
+                yield return new WaitForSeconds(interval);
+
+            }
+        }
     }
 
-    public class Singleton<T> : Base2DBehaviour where T:Base2DBehaviour
+
+
+
+
+
+    public class Singleton<T> : Base2DBehaviour where T : Base2DBehaviour
     {
         protected static T _instance;
 
         /**
            Returns the _instance of this singleton.
         */
+
         public static T Instance
         {
 
@@ -234,12 +266,12 @@ namespace Toolbox
             {
                 if (_instance == null)
                 {
-                    _instance = (T)FindObjectOfType(typeof(T));
+                    _instance = (T) FindObjectOfType(typeof (T));
 
                     if (_instance == null)
                     {
-                        Debug.LogError("An _instance of " + typeof(T) +
-                           " is needed in the scene, but there is none.");
+                        Debug.LogError("An _instance of " + typeof (T) +
+                                       " is needed in the scene, but there is none.");
                     }
                 }
 
@@ -247,6 +279,5 @@ namespace Toolbox
             }
         }
     }
-
-
 }
+

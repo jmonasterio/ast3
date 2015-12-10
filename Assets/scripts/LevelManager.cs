@@ -123,9 +123,9 @@ public class LevelManager : Base2DBehaviour {
         ShowInstructions(false);
         
         ShowInstructions(false);
-        MakeNewPlayer();
         ClearAsteroids();
         StartLevel();
+        Respawn(_player1, 0.5f);
     }
 
     private void MakeNewPlayer()
@@ -182,9 +182,17 @@ public class LevelManager : Base2DBehaviour {
     // Best effort.
     private Vector3 MakeSafeRandomPos()
     {
-        for(int ii=1; ii<1000; ii++)
+        for(int ii=0; ii<1000; ii++)
         {
+
             var pos = MakeRandomCentralPos();
+            if (ii == 0)
+            {
+                // Try the center, because it's the best place.
+                pos = new Vector3(0,0,0);
+            }
+            
+
             if ((_asteroids==null) || (_asteroids.Count == 0))
             {
                 return pos;
@@ -210,13 +218,16 @@ public class LevelManager : Base2DBehaviour {
 
     private Vector3 MakeSafeAsteroidPos()
     {
-        var playerPos = _player1.transform.position;
-        for (int ii = 1; ii < 1000; ii++)
+        if (_player1 != null)
         {
-            var astPos = MakeRandomPos();
-            if (Vector3.Distance(astPos, playerPos) > 2.0)
+            var playerPos = _player1.transform.position;
+            for (int ii = 1; ii < 1000; ii++)
             {
-                return astPos;
+                var astPos = MakeRandomPos();
+                if (Vector3.Distance(astPos, playerPos) > 2.0)
+                {
+                    return astPos;
+                }
             }
         }
         return MakeRandomPos();
@@ -254,7 +265,7 @@ public class LevelManager : Base2DBehaviour {
         ShowInstructions(true);
     }
 
-    public void Respawn(Player player )
+    public void Respawn(Player player, float delay )
     {
         _player1 = null;
 
@@ -262,11 +273,12 @@ public class LevelManager : Base2DBehaviour {
         StartCoroutine(CoroutineUtils.DelaySeconds(() =>
         {
             MakeNewPlayer();
+            _player1.BlinkSprite(1.0f, 0.05f);
 
             // Change the count AFTER the respawn occurs. It looks better.
             GameManager.Instance.Lives--;
 
-        }, 3));
+        }, delay));
 
     }
 
