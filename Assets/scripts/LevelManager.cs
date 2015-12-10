@@ -1,7 +1,6 @@
 ﻿using System;
 using UnityEngine;
 using System.Collections.Generic;
-using Mono.Cecil.Cil;
 using Toolbox;
 using Random = UnityEngine.Random;
 
@@ -240,7 +239,7 @@ public class LevelManager : Base2DBehaviour {
         _jawsIntervalMs = 900;
         _jawsAlternate = true;
         _nextJawsSoundTime = DateTime.Now.AddMilliseconds(_jawsIntervalMs);
-        AddAsteroids( (int) (3.0f + Mathf.Log( (float) Level)));
+        AddAsteroids((int) (3 + Level)); // 3.0 + Mathf.Log( (float) Level)));
     }
 
     private void ShowGameOver(bool b)

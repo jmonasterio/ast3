@@ -1,12 +1,13 @@
 ﻿
 // TODO:
-// Sound for thrust is way late.
+// x Sound for thrust is way late (restart)
+// Limit # of hyperspaces.
+// Blurry asteroids
 // Spawn on edges.
 // Level levelling
 // Alien
 // x Free player every 10000
 // x Blink ships on change.
-// Blurry asteroids
 // x Hyperspace
 // x Background music.
 // x Goofy shaped asteriod.

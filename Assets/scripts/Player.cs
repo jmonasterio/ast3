@@ -26,8 +26,8 @@ public class Player : Wrapped2D
     public Bullet BulletPrefab;
 
     //private Transform[] Ghosts = new Transform[4];
-    private ParticleSystem _exhaust;
-    private ParticleSystem _explosion;
+    private ParticleSystem _exhaustParticleSystem;
+    private ParticleSystem _explosionParticleSystem;
 
     private AudioSource _thrustAudioSource;
 
@@ -49,20 +49,20 @@ public class Player : Wrapped2D
         _bulletsContainer = GameManager.Instance.SceneRoot.FindChild("BulletsContainer");
         System.Diagnostics.Debug.Assert(_bulletsContainer != null);
 
-        _exhaust = Instantiate(ExhaustParticlePrefab);
-        _exhaust.transform.parent = this.transform;
-        _exhaust.transform.position = this.transform.FindChild("ExhaustExit").transform.position;
-        //_exhaust.transform.rotation = this.transform.rotation;
-        //_exhaust.transform.RotateAround( transform.position, transform.up, 180.0f);
-        //_exhaust.enableEmission = true;
-        _exhaust.Stop();
+        _exhaustParticleSystem = Instantiate(ExhaustParticlePrefab);
+        _exhaustParticleSystem.transform.parent = this.transform;
+        _exhaustParticleSystem.transform.position = this.transform.FindChild("ExhaustExit").transform.position;
+        //_exhaustParticleSystem.transform.rotation = this.transform.rotation;
+        //_exhaustParticleSystem.transform.RotateAround( transform.position, transform.up, 180.0f);
+        //_exhaustParticleSystem.enableEmission = true;
+        _exhaustParticleSystem.Stop();
 
-        _explosion = Instantiate(ExplosionParticlePrefab);
-        _explosion.transform.parent = this.transform;
-        _explosion.transform.position = this.transform.position; //new Vector3(0.015f, -0.15f, 0.0f);
-        _explosion.transform.rotation = this.transform.rotation;
-        _explosion.loop = false;
-        _explosion.Stop();
+        _explosionParticleSystem = Instantiate(ExplosionParticlePrefab);
+        _explosionParticleSystem.transform.parent = this.transform;
+        _explosionParticleSystem.transform.position = this.transform.position; //new Vector3(0.015f, -0.15f, 0.0f);
+        _explosionParticleSystem.transform.rotation = this.transform.rotation;
+        _explosionParticleSystem.loop = false;
+        _explosionParticleSystem.Stop();
 
         //var newGhost = (Transform)Instantiate(GhostPrefab, new Vector3(0, _camRect.height, 0), Quaternion.identity);
         //newGhost.parent = transform;
@@ -98,27 +98,27 @@ public class Player : Wrapped2D
         }
         _state = State.Killed;
         Show(false);
-        _exhaust.Stop();
-        _explosion.Play();
+        _exhaustParticleSystem.Stop();
+        _explosionParticleSystem.Play();
         GetComponent<Rigidbody2D>().velocity *= 0.5f; // Slow down when killed.
         GameManager.Instance.PlayerKilled(this);
         GameManager.Instance.PlayClip(ExplosionSound);
-        Destroy(this.gameObject, _explosion.duration + 0.5f); 
+        Destroy(this.gameObject, _explosionParticleSystem.duration + 0.5f); 
     }
-
+ 
     void OnDestroy()
     {
         // Cleanup
-        if (_exhaust != null)
+        if (_exhaustParticleSystem != null)
         {
-            _exhaust.Stop();
+            _exhaustParticleSystem.Stop();
         }
-        if (_explosion != null)
+        if (_explosionParticleSystem != null)
         {
-            _explosion.Stop();
+            _explosionParticleSystem.Stop();
         }
-        SafeDestroy( ref _exhaust);
-        SafeDestroy( ref _explosion);
+        SafeDestroy( ref _exhaustParticleSystem);
+        SafeDestroy( ref _explosionParticleSystem);
     }
 
     // Update is called once per frame
@@ -140,19 +140,19 @@ public class Player : Wrapped2D
                 var rigidBody = GetComponent<Rigidbody2D>();
                 rigidBody.AddRelativeForce(Vector2.up*Thrust*Time.deltaTime);
                 rigidBody.velocity = Vector2.ClampMagnitude(rigidBody.velocity, MaxSpeed);
-                if (_exhaust.isStopped)
+                if (_exhaustParticleSystem.isStopped)
                 {
                     _thrustAudioSource.loop = true;
                     _thrustAudioSource.Play();
-                    _exhaust.Play();
+                    _exhaustParticleSystem.Play();
                 }
             }
             else
             {
-                if (_exhaust.isPlaying)
+                if (_exhaustParticleSystem.isPlaying)
                 {
                     _thrustAudioSource.Stop();
-                    _exhaust.Stop();
+                    _exhaustParticleSystem.Stop();
                 }
             }
 
