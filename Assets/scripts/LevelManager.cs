@@ -28,11 +28,14 @@ public class LevelManager : Base2DBehaviour {
     private DateTime _nextJawsSoundTime;
     private int _jawsIntervalMs;
     private bool _jawsAlternate;
-
+    private Rect _camRect;
 
 
     // Use this for initialization
-    void Start () {
+    void Start ()
+    {
+
+        _camRect = GetCameraWorldRect();
 
         _gameOver = Instantiate(GameOverPrefab);
         //_gameOver.transform.position = Vector3.zero; // TBD SPAWN
@@ -166,16 +169,14 @@ public class LevelManager : Base2DBehaviour {
 
     private Vector3 MakeRandomPos()
     {
-        var camRect = GetCameraWorldRect();
-        return new Vector3(Random.Range(camRect.xMin, camRect.xMax),
-            Random.Range(camRect.yMin, camRect.yMax), 0.0f);
+        return new Vector3(Random.Range(_camRect.xMin, _camRect.xMax),
+            Random.Range(_camRect.yMin, _camRect.yMax), 0.0f);
     }
 
     private Vector3 MakeRandomCentralPos()
     {
-        var camRect = GetCameraWorldRect();
-        return new Vector3(Random.Range(camRect.xMin/2, camRect.xMax/2),
-            Random.Range(camRect.yMin/2, camRect.yMax/2), 0.0f);
+        return new Vector3(Random.Range(_camRect.xMin/2, _camRect.xMax/2),
+            Random.Range(_camRect.yMin/2, _camRect.yMax/2), 0.0f);
     }
 
     // Best effort.

@@ -75,14 +75,14 @@ namespace Toolbox
             return camRect;
         }
 
-        public Vector2 PosTo2D()
+        public Vector2 To2D(Vector3 v3)
         {
-            return new Vector2(transform.position.x, transform.position.y);
+            return new Vector2(v3.x, v3.y);
         }
 
-        public void PosFrom2D(Vector2 v2)
+        public Vector3 From2D(Vector2 v2)
         {
-            transform.position = new Vector3(v2.x, v2.y, 0.0f);
+            return new Vector3(v2.x, v2.y, 0.0f);
         }
 
 
