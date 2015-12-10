@@ -1,11 +1,15 @@
 ﻿
 // TODO:
-// x Sound for thrust is way late (restart)
+// x Score doesn't show in Javascript
+// Script to fixup HTML
+// Hyperspace not working
+// Alien
+// Pause before starting a new game because fire key starts it right away.
 // Limit # of hyperspaces.
 // Blurry asteroids
 // Spawn on edges.
-// Level levelling
-// Alien
+// x Level levelling
+// x Sound for thrust is way late (restart)
 // x Free player every 10000
 // x Blink ships on change.
 // x Hyperspace

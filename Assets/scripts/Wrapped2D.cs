@@ -7,10 +7,14 @@ public class Wrapped2D : Base2DBehaviour
 
     protected Rect? _camRect = null;
 
+    // Update is called once per frame
+    void Update()
+    {
+        WrapScreen();
+    }
 
     protected void WrapScreen()
     {
-
         if (!_camRect.HasValue)
         {
             // Cache
@@ -42,13 +46,4 @@ public class Wrapped2D : Base2DBehaviour
         }
         PosFrom2D(t);
     }
-
-
-    protected void StopRigidBody()
-    {
-        var rigidBody = GetComponent<Rigidbody2D>();
-        transform.position = new Vector3(0, 0, 0);
-        rigidBody.velocity = new Vector3(0, 0, 0);
-    }
-
 }

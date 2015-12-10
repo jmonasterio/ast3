@@ -5,7 +5,7 @@ using System.Security.Cryptography.X509Certificates;
 using UnityEngine;
 using Toolbox;
 
-public class Player : Wrapped2D
+public class Player : Base2DBehaviour
 {
     public int MAX_BULLETS = 3;
 
@@ -169,8 +169,6 @@ public class Player : Wrapped2D
             }
         }
 
-        // Always run this, so even explosions wrap.
-        WrapScreen();
     }
 
 

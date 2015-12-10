@@ -2,7 +2,7 @@
 using System.Collections;
 using Toolbox;
 
-public class Asteroid : Wrapped2D
+public class Asteroid : Base2DBehaviour
 {
 
     public AudioClip ExplosionSound;
@@ -18,6 +18,5 @@ public class Asteroid : Wrapped2D
 
     // Update is called once per frame
 	void Update () {
-        WrapScreen();
     }
 }

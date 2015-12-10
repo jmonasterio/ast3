@@ -3,17 +3,15 @@ using UnityEngine;
 using System.Collections;
 using Toolbox;
 
-public class Bullet : Wrapped2D {
+public class Bullet : Base2DBehaviour {
 
     // Use this for initialization
 	void Start () {
-	
 	}
 	
 	// Update is called once per frame
     void Update()
     {
-        WrapScreen();
 	}
 
     void OnTriggerEnter2D(Collider2D other)
