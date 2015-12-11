@@ -21,13 +21,20 @@ public class Alien : Base2DBehaviour
     public Sizes Size;
     public AudioClip ExplosionSound;
     public ParticleSystem ExplosionParticlePrefab;
+    public int MAX_BULLETS = 1;
+    public AudioClip ShootSound;
 
     private ParticleSystem _explosionParticleSystem;
+
 
     private States _state;
     private List<Vector3> _path = new List<Vector3>();
     private int _curPoint = 0;
     private float travelSpeed = 100.0f;
+    public Bullet BulletPrefab;
+    private Bullet _bullet;
+    private GameObject _bulletsContainer;
+    private GameObject _muzzle;
 
     public void SetPath(List<Vector3> newPath)
     {
@@ -39,6 +46,9 @@ public class Alien : Base2DBehaviour
     void Start ()
     {
         var camRect = GetCameraWorldRect();
+        _muzzle = this.transform.FindChild("Muzzle").gameObject;
+
+        _bulletsContainer = GameManager.Instance.SceneRoot.FindOrCreateTempContainer( "AlienBulletContainer");
 
         // TBD: DRY
         _explosionParticleSystem = Instantiate(ExplosionParticlePrefab);
@@ -48,6 +58,7 @@ public class Alien : Base2DBehaviour
         _explosionParticleSystem.loop = false;
         _explosionParticleSystem.Stop();
     }
+
 
     // Update is called once per frame
     void Update ()
@@ -81,7 +92,42 @@ public class Alien : Base2DBehaviour
             
         }
 
+        if (_bullet == null)
+        {
+            FireBullet();
+        }
 
+    }
+
+    private void FireBullet()
+    {
+
+        if (_bulletsContainer.transform.childCount < MAX_BULLETS)
+        {
+            var newBullet = Instantiate(BulletPrefab);
+            newBullet.Source = Bullet.Sources.AlienShooter;
+            newBullet.transform.parent = _bulletsContainer.transform;
+            newBullet.transform.position = _muzzle.transform.position;
+            newBullet.transform.rotation = this.transform.rotation;
+            newBullet.transform.localScale = new Vector3(2.0f, 2.0f, 0);
+
+            var target = GameManager.Instance.LevelManager.GetAlienTargetOrNull();
+            Vector2 dir;
+            if (target.HasValue)
+            {
+                dir = target.Value - _muzzle.transform.position;
+            }
+            else
+            {
+                dir = MakeRandom2D();
+            }
+
+            newBullet.GetComponent<Rigidbody2D>().AddRelativeForce(dir *0.5f, ForceMode2D.Impulse);
+            newBullet.gameObject.SetActive(true);
+
+            GameManager.Instance.PlayClip(ShootSound);
+            Destroy(newBullet.gameObject, 3.0f);
+        }
     }
 
     void OnTriggerEnter2D(Collider2D other)
@@ -91,16 +137,27 @@ public class Alien : Base2DBehaviour
             // Avoid collision with self.
             return;
         }
-        if (other.gameObject.GetComponent<Bullet>() != null) // Bullet does its own detection.
+        if (other.gameObject.GetComponent<Bullet>())
         {
-            return; // 
+            var bullet = other.gameObject.GetComponent<Bullet>();
+            if (bullet.Source == Bullet.Sources.AlienShooter)
+            {
+                // We don't allow shooting ourself
+                return; // 
+            }
         }
+        AlienKilled();
+    }
+
+    private void AlienKilled()
+    {
         _state = States.Killed;
         Show(false);
         _explosionParticleSystem.Play();
         GetComponent<Rigidbody2D>().velocity *= 0.5f; // Slow down when killed.
-        GameManager.Instance.LevelManager.DestroyAlien(this, explode:true);
+        GameManager.Instance.LevelManager.DestroyAlien(this, explode: true);
         GameManager.Instance.PlayClip(ExplosionSound);
+        GameManager.Instance.Score += ((this.Size == Alien.Sizes.Small) ? 1000 : 500);
         Destroy(this.gameObject, _explosionParticleSystem.duration + 0.5f);
     }
 
@@ -109,10 +166,10 @@ public class Alien : Base2DBehaviour
         _curPoint++;
         if (_curPoint >= _path.Count)
         {
+            //If end of path, we're done.
             GameManager.Instance.LevelManager.DestroyAlien(this, explode: false);
         }
 
-        // TBD: If finished, we're done.
     }
 
 

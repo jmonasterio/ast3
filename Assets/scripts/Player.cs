@@ -37,8 +37,9 @@ public class Player : Base2DBehaviour
         Killed = 1
     }
 
+
     private State _state;
-    private Transform _bulletsContainer;
+    private GameObject _bulletsContainer;
 
 
     // Use this for initialization
@@ -46,7 +47,8 @@ public class Player : Base2DBehaviour
     {
         _thrustAudioSource = GetComponent<AudioSource>();
 
-        _bulletsContainer = GameManager.Instance.SceneRoot.FindChild("BulletsContainer");
+        _bulletsContainer = GameManager.Instance.SceneRoot.FindOrCreateTempContainer("PlayerBulletsContainer");
+        
         System.Diagnostics.Debug.Assert(_bulletsContainer != null);
 
         _exhaustParticleSystem = Instantiate(ExhaustParticlePrefab);
@@ -92,10 +94,23 @@ public class Player : Base2DBehaviour
             // Avoid collision with self.
             return;
         }
-        if (other.gameObject.name.StartsWith("Bullet")) // TBD: Improve.
+        if (other.gameObject.GetComponent<Bullet>())
         {
-            return; // 
+            var bullet = other.gameObject.GetComponent<Bullet>();
+            if (bullet.Source == Bullet.Sources.PlayerShooter)
+            {
+                // We don't allow shooting ourself
+                return; // 
+            }
         }
+        PlayerKilled();
+    }
+
+    /// <summary>
+    /// Could also be called by alien bullet.
+    /// </summary>
+    private void PlayerKilled()
+    {
         _state = State.Killed;
         Show(false);
         _exhaustParticleSystem.Stop();
@@ -103,9 +118,9 @@ public class Player : Base2DBehaviour
         GetComponent<Rigidbody2D>().velocity *= 0.5f; // Slow down when killed.
         GameManager.Instance.PlayerKilled(this);
         GameManager.Instance.PlayClip(ExplosionSound);
-        Destroy(this.gameObject, _explosionParticleSystem.duration + 0.5f); 
+        Destroy(this.gameObject, _explosionParticleSystem.duration + 0.5f);
     }
- 
+
     void OnDestroy()
     {
         // Cleanup
@@ -175,10 +190,11 @@ public class Player : Base2DBehaviour
     private void FireBullet()
     {
 
-        if (_bulletsContainer.childCount < MAX_BULLETS)
+        if (_bulletsContainer.transform.childCount < MAX_BULLETS)
         {
             var newBullet = Instantiate(BulletPrefab);
-            newBullet.transform.parent = _bulletsContainer;
+            newBullet.Source = Bullet.Sources.PlayerShooter;
+            newBullet.transform.parent = _bulletsContainer.transform;
             newBullet.transform.position = this.transform.FindChild("Muzzle").transform.position;
             newBullet.transform.rotation = this.transform.rotation;
             newBullet.transform.localScale = new Vector3(1.0f, 1.0f, 0);

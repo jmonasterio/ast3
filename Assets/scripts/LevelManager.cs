@@ -33,11 +33,33 @@ public class LevelManager : Base2DBehaviour {
     private bool _jawsAlternate;
     private Rect _camRect;
     private double _disableStartButtonUntilTime; // TBD: Clunky
+    private GameObject _asteroidContainer;
+    private float _lastAsteroidKilled;
+
+    public Vector3? GetAlienTargetOrNull()
+    {
+        if (Random.Range(0, 10) > 4)
+        {
+            if ( _player1 == null)
+            {
+                return null;
+            }
+            return _player1.transform.position;
+        }
+        else
+        {
+            if (_asteroids.Count > 0)
+            {
+                return _asteroids[Random.Range(0, _asteroids.Count)].transform.position;
+            }
+        }
+        return null;
+    }
 
     // Use this for initialization
     void Start ()
     {
-
+        _asteroidContainer = GameManager.Instance.SceneRoot.FindOrCreateTempContainer("AsteroidContainer");
         _camRect = GetCameraWorldRect();
 
         _gameOver = Instantiate(GameOverPrefab);
@@ -92,7 +114,9 @@ public class LevelManager : Base2DBehaviour {
         {
             if (_alien == null)
             {
-                if (Random.Range(0, 100) > 97)
+                float diff =  Time.time - _lastAsteroidKilled;
+
+                if ( (diff > 8.0f) || GetRemainingAsteroidCount()<5 &&  Random.Range(0, 1000) > (996-Level*2))
                 {
                     _alien = Instantiate(AlienPrefab);
                     _alien.Size = (Random.Range(0, 3) == 0) ? Alien.Sizes.Small : Alien.Sizes.Big;
@@ -299,6 +323,7 @@ public class LevelManager : Base2DBehaviour {
         _jawsAlternate = true;
         _nextJawsSoundTime += _jawsIntervalSeconds;
         AddAsteroids((int) (2 + Level)); // 3.0 + Mathf.Log( (float) Level)));
+        _lastAsteroidKilled = Time.time + 15.0f;
     }
 
     private void ShowGameOver(bool b)
@@ -343,7 +368,7 @@ public class LevelManager : Base2DBehaviour {
 
             // Change the count AFTER the respawn occurs. It looks better.
             GameManager.Instance.Lives--;
-
+            _lastAsteroidKilled = Time.time;
         }, delay));
 
     }
@@ -380,11 +405,15 @@ public class LevelManager : Base2DBehaviour {
             //rigid.AddRelativeForce( rigid.velocity * 0.05f, ForceMode2D.Impulse);
         }
 
-        Destroy(ast.gameObject); // TBD: ExplosionSound & Split asteroid & keep count.
+        Destroy(ast.gameObject); 
 
         if (_asteroids.Count == 0)
         {
             StartLevel();
+        }
+        else
+        {
+            _lastAsteroidKilled = Time.time;
         }
     }
 
@@ -398,7 +427,7 @@ public class LevelManager : Base2DBehaviour {
         newAst.transform.localScale = newAst.transform.localScale * 3; // Original graphics were too tiny.
         newAst.transform.position = pos;
         newAst.transform.rotation = Quaternion.identity;
-        newAst.transform.parent = this.transform.parent.transform.FindChild("AsteroidField");
+        newAst.transform.parent = _asteroidContainer.transform;
         newAst.GetComponent<Rigidbody2D>().AddForce(force);
         newAst.GetComponent<Rigidbody2D>().AddTorque(spin);
         newAst.gameObject.SetActive(true);
@@ -411,13 +440,38 @@ public class LevelManager : Base2DBehaviour {
     private void CreateAsteroidOrAlienExplosion(Vector3 position)
     {
         var explosion = Instantiate(AsteroidExplosionParticlePrefab);
-        explosion.transform.parent = this.transform.parent.transform.FindChild("AsteroidField");
+        explosion.transform.parent = _asteroidContainer.transform;
         explosion.transform.position = position;
         explosion.transform.rotation = this.transform.rotation;
         //_exhaust.enableEmission = true;
         explosion.Play();
         DestroyObject( explosion, explosion.duration + 0.25f);
 
+    }
+
+    public int GetRemainingAsteroidCount()
+    {
+        int cnt = 0;
+        foreach (var ast in _asteroids)
+        {
+            if (ast.Size == Asteroid.Sizes.Small)
+            {
+                cnt++;
+            }
+            else if (ast.Size == Asteroid.Sizes.Medium)
+            {
+                cnt += 3;
+            }
+            else if (ast.Size == Asteroid.Sizes.Large)
+            {
+                cnt += 6;
+            }
+            else
+            {
+                throw new NotImplementedException( "unexpected asteroid size");
+            }
+        }
+        return cnt;
     }
 
 

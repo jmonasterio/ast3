@@ -1,6 +1,7 @@
 ﻿using System;
 using System.Collections;
 using UnityEngine;
+using Random = UnityEngine.Random;
 
 namespace Toolbox
 {
@@ -11,6 +12,26 @@ namespace Toolbox
         {
             return Mathf.Round(f/multiple)*multiple;
         }
+    }
+
+    public static class GameObjectExt
+    {
+        public static GameObject FindOrCreateTempContainer(this Transform root, string name)
+        {
+
+            var trans = root.FindChild(name);
+            if (trans == null)
+            {
+                var ret = new GameObject(name);
+                ret.transform.parent = root;
+                return ret;
+            }
+            else
+            {
+                return trans.gameObject;
+            }
+        }
+
     }
 
     public static class CoroutineUtils
@@ -61,6 +82,12 @@ namespace Toolbox
 
     public class Base2DBehaviour : MonoBehaviour
     {
+        protected Vector2 MakeRandom2D()
+        {
+            return new Vector2(Random.Range(-1.0f, 1.0f), Random.Range(-1.0f, 1.0f)).normalized;
+        }
+
+
         public void Show(bool b)
         {
             GetComponent<SpriteRenderer>().enabled = b;

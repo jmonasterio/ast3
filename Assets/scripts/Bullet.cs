@@ -5,6 +5,16 @@ using Toolbox;
 
 public class Bullet : Base2DBehaviour {
 
+    public enum Sources
+    {
+        AlienShooter,
+        PlayerShooter
+    }
+
+    public Sources Source;
+
+
+
     // Use this for initialization
 	void Start () {
 	}
@@ -49,14 +59,6 @@ public class Bullet : Base2DBehaviour {
             Destroy(this.gameObject);
 
 
-        }
-        else if (other.gameObject.GetComponent<Alien>() != null)
-        {
-
-            var alien = other.gameObject.GetComponent<Alien>();
-            GameManager.Instance.PlayClip(alien.ExplosionSound);
-            GameManager.Instance.LevelManager.DestroyAlien(alien, explode: true); //ize does not matter.
-            GameManager.Instance.Score += ((alien.Size == Alien.Sizes.Small) ? 1000 : 500);
         }
 
     }

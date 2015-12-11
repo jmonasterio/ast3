@@ -1,5 +1,8 @@
 ﻿
 // TODO:
+// Maybe a ShooterComponent
+// Refactor base2d into extensions
+// Create bullet containers dynamically.
 // ManagedPlugins
 // New GameManager design
 // Make alien shoot
