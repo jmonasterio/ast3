@@ -121,7 +121,7 @@ public class LevelManager : Base2DBehaviour {
                     _alien = Instantiate(AlienPrefab);
                     _alien.Size = (Random.Range(0, 3) == 0) ? Alien.Sizes.Small : Alien.Sizes.Big;
                     _alien.SetPath(MakeRandomPath());
-                    _alien.transform.localScale = _alien.transform.localScale*(_alien.Size == Alien.Sizes.Small ? 1 : 2);
+                    _alien.transform.localScale = _alien.transform.localScale*(_alien.Size == Alien.Sizes.Small ? 0.3f : 0.6f);
 
                     if (IsGamePlaying())
                     {
@@ -244,7 +244,8 @@ public class LevelManager : Base2DBehaviour {
 
     private Vector2 MakeRandomForce()
     {
-        var f = new Vector2(Random.Range(-25.0f, 25.0f), Random.Range(-20.0f, 20.0f));
+        const float max = 15.0f;
+        var f = new Vector2(Random.Range(-max, max), Random.Range(-max, max));
         f = f * 2.0f;
         return f;
     }
@@ -424,7 +425,7 @@ public class LevelManager : Base2DBehaviour {
         var force = MakeRandomForce();
         var prefab = GetPrefabBySize(astSize);
         var newAst = Instantiate(prefab);
-        newAst.transform.localScale = newAst.transform.localScale * 3; // Original graphics were too tiny.
+        newAst.transform.localScale = newAst.transform.localScale * 1; // Original graphics were too tiny.
         newAst.transform.position = pos;
         newAst.transform.rotation = Quaternion.identity;
         newAst.transform.parent = _asteroidContainer.transform;

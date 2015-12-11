@@ -30,7 +30,7 @@ public class Alien : Base2DBehaviour
     private States _state;
     private List<Vector3> _path = new List<Vector3>();
     private int _curPoint = 0;
-    private float travelSpeed = 100.0f;
+    private float travelSpeed = 25.0f;
     public Bullet BulletPrefab;
     private Bullet _bullet;
     private GameObject _bulletsContainer;
@@ -109,7 +109,7 @@ public class Alien : Base2DBehaviour
             newBullet.transform.parent = _bulletsContainer.transform;
             newBullet.transform.position = _muzzle.transform.position;
             newBullet.transform.rotation = this.transform.rotation;
-            newBullet.transform.localScale = new Vector3(2.0f, 2.0f, 0);
+            //newBullet.transform.localScale = new Vector3(2.0f, 2.0f, 0);
 
             var target = GameManager.Instance.LevelManager.GetAlienTargetOrNull();
             Vector2 dir;

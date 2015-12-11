@@ -9,8 +9,8 @@ public class Player : Base2DBehaviour
 {
     public int MAX_BULLETS = 3;
 
-    public float RotateSpeed = 100.0f;
-    public float Thrust = 100.0f;
+    public float RotateSpeed = 150f;
+    public float Thrust = 40.0f;
     public float AngleIncrement = 5.0f;
     public float MaxSpeed = 50.0f;
     public int PlayerIndex = 0; // Or 1, for 2 players.
@@ -197,12 +197,12 @@ public class Player : Base2DBehaviour
             newBullet.transform.parent = _bulletsContainer.transform;
             newBullet.transform.position = this.transform.FindChild("Muzzle").transform.position;
             newBullet.transform.rotation = this.transform.rotation;
-            newBullet.transform.localScale = new Vector3(1.0f, 1.0f, 0);
-            newBullet.GetComponent<Rigidbody2D>().AddRelativeForce(Vector2.up*4.0f, ForceMode2D.Impulse);
+            //newBullet.transform.localScale = new Vector3(0.5f, 0.5f, 0);
+            newBullet.GetComponent<Rigidbody2D>().AddRelativeForce(Vector2.up*2.0f, ForceMode2D.Impulse);
             newBullet.gameObject.SetActive(true);
 
             GameManager.Instance.PlayClip(ShootSound);
-            Destroy(newBullet.gameObject, 1.5f);
+            Destroy(newBullet.gameObject, 1.0f);
         }
     }
 
