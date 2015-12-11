@@ -39,7 +39,6 @@ public class LevelManager : Base2DBehaviour {
     {
 
         _camRect = GetCameraWorldRect();
-        _disableStartButtonUntilTime = Time.time;
 
         _gameOver = Instantiate(GameOverPrefab);
         //_gameOver.transform.position = Vector3.zero; // TBD SPAWN
@@ -55,6 +54,7 @@ public class LevelManager : Base2DBehaviour {
 
         ShowGameOver(true);
         ShowInstructions(true);
+        _disableStartButtonUntilTime = Time.time;
     }
 
     // Update is called once per frame
@@ -101,7 +101,7 @@ public class LevelManager : Base2DBehaviour {
 
                     if (IsGamePlaying())
                     {
-                        _alien.PlaySound();
+                        _alien.PlaySound( true);
                     }
                 }
             }
@@ -318,7 +318,13 @@ public class LevelManager : Base2DBehaviour {
 
     public void GameOver(Player player)
     {
+        if (_alien != null)
+        {
+            _alien.PlaySound( false);
+        }
         _player1 = null;
+        Level = 0;
+        // Leave score.
 
         ShowGameOver(true);
         ShowInstructions(true);

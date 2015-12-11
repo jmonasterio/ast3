@@ -116,13 +116,20 @@ public class Alien : Base2DBehaviour
     }
 
 
-    public void PlaySound()
+    public void PlaySound( bool play)
     {
         var audioSource = GetComponent<AudioSource>();
-        audioSource.loop = true;
-        audioSource.clip = (this.Size == Alien.Sizes.Small)
-            ? GameManager.Instance.LevelManager.AlienSoundSmall
-            : GameManager.Instance.LevelManager.AlienSoundBig;
-        audioSource.Play();
+        if (play)
+        {
+            audioSource.loop = true;
+            audioSource.clip = (this.Size == Alien.Sizes.Small)
+                ? GameManager.Instance.LevelManager.AlienSoundSmall
+                : GameManager.Instance.LevelManager.AlienSoundBig;
+            audioSource.Play();
+        }
+        else
+        {
+            audioSource.Stop();
+        }
     }
 }

@@ -2,14 +2,17 @@
 // TODO:
 // ManagedPlugins
 // New GameManager design
-// x Score doesn't show in Javascript
-// Script to fixup HTML (Build player pipeline).
+// Make alien shoot
 // Hyperspace not working
-// Alien
+// x Alien path finding
+// x Alien
 // Pause before starting a new game because fire key starts it right away.
 // Limit # of hyperspaces.
 // Blurry asteroids
 // Spawn on edges.
+// Script to fixup HTML (Build player pipeline).
+// No gameover timeout on first screen.
+// x Score doesn't show in Javascript
 // x Level levelling
 // x Sound for thrust is way late (restart)
 // x Free player every 10000
