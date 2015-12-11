@@ -43,20 +43,14 @@ public class Alien : Base2DBehaviour
     }
 
     // Use this for initialization
-    void Start ()
+    void Start()
     {
         var camRect = GetCameraWorldRect();
         _muzzle = this.transform.FindChild("Muzzle").gameObject;
 
-        _bulletsContainer = GameManager.Instance.SceneRoot.FindOrCreateTempContainer( "AlienBulletContainer");
+        _bulletsContainer = GameManager.Instance.SceneRoot.FindOrCreateTempContainer("AlienBulletContainer");
 
-        // TBD: DRY
-        _explosionParticleSystem = Instantiate(ExplosionParticlePrefab);
-        _explosionParticleSystem.transform.parent = this.transform;
-        _explosionParticleSystem.transform.position = this.transform.position; //new Vector3(0.015f, -0.15f, 0.0f);
-        _explosionParticleSystem.transform.rotation = this.transform.rotation;
-        _explosionParticleSystem.loop = false;
-        _explosionParticleSystem.Stop();
+        _explosionParticleSystem = InstantiateParticleSystemAtTransform(ExplosionParticlePrefab, this.transform);
     }
 
 

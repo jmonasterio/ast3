@@ -1,9 +1,6 @@
-﻿using System;
-using System.Collections;
-using System.Collections.Generic;
-using System.Security.Cryptography.X509Certificates;
-using UnityEngine;
+﻿using UnityEngine;
 using Toolbox;
+
 
 public class Player : Base2DBehaviour
 {
@@ -48,33 +45,12 @@ public class Player : Base2DBehaviour
         _thrustAudioSource = GetComponent<AudioSource>();
 
         _bulletsContainer = GameManager.Instance.SceneRoot.FindOrCreateTempContainer("PlayerBulletsContainer");
+
+        this._exhaustParticleSystem = InstantiateParticleSystemAtTransform(ExhaustParticlePrefab, this.transform.FindChild("ExhaustExit").transform);
+        _exhaustParticleSystem.transform.rotation = new Quaternion(0f, 0f, -180f, 0f);
+
+        _explosionParticleSystem = InstantiateParticleSystemAtTransform(ExplosionParticlePrefab, this.transform);
         
-        System.Diagnostics.Debug.Assert(_bulletsContainer != null);
-
-        _exhaustParticleSystem = Instantiate(ExhaustParticlePrefab);
-        _exhaustParticleSystem.transform.parent = this.transform;
-        _exhaustParticleSystem.transform.position = this.transform.FindChild("ExhaustExit").transform.position;
-        //_exhaustParticleSystem.transform.rotation = this.transform.rotation;
-        //_exhaustParticleSystem.transform.RotateAround( transform.position, transform.up, 180.0f);
-        //_exhaustParticleSystem.enableEmission = true;
-        _exhaustParticleSystem.Stop();
-
-        _explosionParticleSystem = Instantiate(ExplosionParticlePrefab);
-        _explosionParticleSystem.transform.parent = this.transform;
-        _explosionParticleSystem.transform.position = this.transform.position; //new Vector3(0.015f, -0.15f, 0.0f);
-        _explosionParticleSystem.transform.rotation = this.transform.rotation;
-        _explosionParticleSystem.loop = false;
-        _explosionParticleSystem.Stop();
-
-        //var newGhost = (Transform)Instantiate(GhostPrefab, new Vector3(0, _camRect.height, 0), Quaternion.identity);
-        //newGhost.parent = transform;
-        //newGhost = (Transform)Instantiate(GhostPrefab, new Vector3(0, -_camRect.height, 0), Quaternion.identity);
-        //newGhost.parent = transform;
-        //newGhost = (Transform)Instantiate(GhostPrefab, new Vector3(_camRect.width, 0, 0), Quaternion.identity);
-        //newGhost.parent = transform;
-        //newGhost = (Transform)Instantiate(GhostPrefab, new Vector3(-_camRect.width, 0, 0), Quaternion.identity);
-        //newGhost.parent = transform;
-
         _state = State.Alive;
     }
 
@@ -198,7 +174,7 @@ public class Player : Base2DBehaviour
             newBullet.transform.position = this.transform.FindChild("Muzzle").transform.position;
             newBullet.transform.rotation = this.transform.rotation;
             //newBullet.transform.localScale = new Vector3(0.5f, 0.5f, 0);
-            newBullet.GetComponent<Rigidbody2D>().AddRelativeForce(Vector2.up*2.0f, ForceMode2D.Impulse);
+            newBullet.GetComponent<Rigidbody2D>().AddRelativeForce(Vector2.up*1.4f, ForceMode2D.Impulse);
             newBullet.gameObject.SetActive(true);
 
             GameManager.Instance.PlayClip(ShootSound);

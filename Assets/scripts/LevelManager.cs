@@ -63,13 +63,11 @@ public class LevelManager : Base2DBehaviour {
         _camRect = GetCameraWorldRect();
 
         _gameOver = Instantiate(GameOverPrefab);
-        //_gameOver.transform.position = Vector3.zero; // TBD SPAWN
         _gameOver.transform.rotation = Quaternion.identity;
         _gameOver.transform.parent = GameManager.Instance.SceneRoot;
         _gameOver.gameObject.SetActive(true);
 
         _instructions = Instantiate(InstructionsPrefab);
-        //_gameOver.transform.position = Vector3.zero; // TBD SPAWN
         _instructions.transform.rotation = Quaternion.identity;
         _instructions.transform.parent = GameManager.Instance.SceneRoot;
         _instructions.gameObject.SetActive(true);
@@ -142,13 +140,13 @@ public class LevelManager : Base2DBehaviour {
         var camRect = GetCameraWorldRect();
         var path = new List<Vector3>();
 
-        path.Add( new Vector3(_camRect.xMin -0.5f, Random.Range(_camRect.yMin*0.9f, _camRect.yMax*0.9f)));
+        path.Add( new Vector3(_camRect.xMin, Random.Range(_camRect.yMin*0.8f, _camRect.yMax*0.8f)));
 
 //        for (var segment = 0; segment <= 4; segment++)
   //      {
     //        path.Add( )
      //   }
-        path.Add( new Vector3(_camRect.xMax + 0.5f, Random.Range(_camRect.yMin * 0.9f, _camRect.yMax * 0.9f)));
+        path.Add( new Vector3(_camRect.xMax, Random.Range(_camRect.yMin * 0.8f, _camRect.yMax * 0.8f)));
 
         if (Random.Range(0, 2) == 0)
         {
@@ -283,7 +281,7 @@ public class LevelManager : Base2DBehaviour {
             bool foundClose = false;
             foreach (var ast in _asteroids)
             {
-                if (Vector3.Distance(ast.transform.position, pos) < 2.0)
+                if (Vector3.Distance(ast.transform.position, pos) < 0.75f)
                 {
                     foundClose = true;
                     break;
@@ -361,7 +359,6 @@ public class LevelManager : Base2DBehaviour {
     {
         _player1 = null;
 
-        // TBD: Would be cleaner in a base class.
         StartCoroutine(CoroutineUtils.DelaySeconds(() =>
         {
             MakeNewPlayer();
@@ -390,7 +387,7 @@ public class LevelManager : Base2DBehaviour {
         bool removed = _asteroids.Remove(ast);
         System.Diagnostics.Debug.Assert(removed);
 
-        CreateAsteroidOrAlienExplosion(ast.transform.position); // TBD: Maybe put sound here, too.
+        CreateAsteroidOrAlienExplosion(ast.transform.position); 
 
         for (int ii = 0; ii < p1; ii++)
         {

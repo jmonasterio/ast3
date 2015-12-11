@@ -16,6 +16,20 @@ namespace Toolbox
 
     public static class GameObjectExt
     {
+        /// <summary>
+        /// Gets or add a component. Usage example:
+        /// BoxCollider boxCollider = transform.GetOrAddComponent<BoxCollider>();
+        /// </summary>
+        public static T GetOrAddComponent<T>(this Component child) where T : Component
+        {
+            T result = child.GetComponent<T>();
+            if (result == null)
+            {
+                result = child.gameObject.AddComponent<T>();
+            }
+            return result;
+        }
+
         public static GameObject FindOrCreateTempContainer(this Transform root, string name)
         {
 
@@ -50,7 +64,7 @@ namespace Toolbox
         {
             foreach (IEnumerator action in actions)
             {
-                yield return GameManager.Instance.StartCoroutine(action); // TBD
+                yield return GameManager.Instance.StartCoroutine(action); 
             }
         }
 
@@ -82,6 +96,19 @@ namespace Toolbox
 
     public class Base2DBehaviour : MonoBehaviour
     {
+        protected static ParticleSystem InstantiateParticleSystemAtTransform(ParticleSystem prefab, Transform tr)
+        {
+            var explosionParticleSystem = Instantiate(prefab);
+            explosionParticleSystem.transform.parent = tr;
+            explosionParticleSystem.transform.position = tr.position;
+            explosionParticleSystem.transform.rotation = tr.rotation;
+            explosionParticleSystem.loop = false;
+            explosionParticleSystem.Stop();
+            return explosionParticleSystem;
+        }
+
+
+
         protected Vector2 MakeRandom2D()
         {
             return new Vector2(Random.Range(-1.0f, 1.0f), Random.Range(-1.0f, 1.0f)).normalized;
