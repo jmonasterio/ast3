@@ -37,6 +37,7 @@ public class Player : Base2DBehaviour
 
     private State _state;
     private GameObject _bulletsContainer;
+    private float _lastHyperSpaceTime;
 
 
     // Use this for initialization
@@ -154,9 +155,10 @@ public class Player : Base2DBehaviour
             }
 
             bool hyperPressed = Input.GetButtonDown("HyperSpace") || Input.GetButtonDown("HyperSpace2");
-            if( hyperPressed)
+            if( hyperPressed && (Time.time - _lastHyperSpaceTime > 1.0))
             {
                 GameManager.Instance.LevelManager.HyperSpace();
+                _lastHyperSpaceTime = Time.time;
             }
         }
 
@@ -178,7 +180,7 @@ public class Player : Base2DBehaviour
             newBullet.gameObject.SetActive(true);
 
             GameManager.Instance.PlayClip(ShootSound);
-            Destroy(newBullet.gameObject, 1.0f);
+            Destroy(newBullet.gameObject, 1.4f);
         }
     }
 

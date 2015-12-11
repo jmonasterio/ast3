@@ -10,7 +10,7 @@
 // x Hyperspace not working
 // x Alien path finding
 // x Alien
-// Pause before starting a new game because fire key starts it right away.
+// x Pause before starting a new game because fire key starts it right away.
 // Limit # of hyperspaces.
 // Blurry asteroids
 // Spawn on edges.
