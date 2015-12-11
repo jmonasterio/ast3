@@ -35,7 +35,7 @@ public class GameManager : Singleton<GameManager>
 	void Awake()
 	{
 	    SceneRoot = this.transform.parent;
-	    LevelManager = Instantiate(LevelManagerPrefab); // TBD: Cleanup.
+	    LevelManager = Instantiate(LevelManagerPrefab); 
 	    LevelManager.transform.parent = this.transform.parent;
 	}
 

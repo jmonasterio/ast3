@@ -8,7 +8,7 @@ public class LevelManager : Base2DBehaviour {
 
     public int Level { get; set; }
     public Asteroid[] AsteroidPrefabs;
-    public Alien AlienPrefab; // TBD
+    public Alien AlienPrefab; 
     public Player PlayerPrefab;
     public GameOver GameOverPrefab;
     public Instructions InstructionsPrefab;
@@ -32,7 +32,7 @@ public class LevelManager : Base2DBehaviour {
     private float _jawsIntervalSeconds;
     private bool _jawsAlternate;
     private Rect _camRect;
-    private double _disableStartButtonUntilTime; // TBD: Clunky
+    private double _disableStartButtonUntilTime; 
     private GameObject _asteroidContainer;
     private float _lastAsteroidKilled;
 
@@ -93,9 +93,9 @@ public class LevelManager : Base2DBehaviour {
         {
             if (_player1 != null) // Means we're in level
             {
-                if (_jawsIntervalSeconds > 180.0f)
+                if (_jawsIntervalSeconds > .1800f)
                 {
-                    _jawsIntervalSeconds -= 5.0f;
+                    _jawsIntervalSeconds -= .005f;
                 }
                 _nextJawsSoundTime = Time.time + _jawsIntervalSeconds;
                 if (_jawsAlternate)

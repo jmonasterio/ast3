@@ -177,7 +177,7 @@ public class Player : Base2DBehaviour
                 FireBullet();
             }
 
-            bool hyperPressed = Input.GetButtonDown("HyperSpace");
+            bool hyperPressed = Input.GetButtonDown("HyperSpace") || Input.GetButtonDown("HyperSpace2");
             if( hyperPressed)
             {
                 GameManager.Instance.LevelManager.HyperSpace();
