@@ -4,6 +4,22 @@ using Toolbox;
 
 public class Player : Base2DBehaviour
 {
+    public class Buttons
+    {
+        public const string HORIZ = "Horizontal";
+        public const string VERT = "Vertical";
+        public const string HYPERSPACE = "HyperSpace";
+        public const string HYPERSPACE2 = "HyperSpace2";
+        public const string JUMP = "Jump";
+        public const string FIRE1 = "Fire1";
+    }
+
+    public class GoNames
+    {
+        public const string BULLET_CONTAINER_NAME = "PlayerBulletsContainer";
+        public const string EXHAUST_EXIT = "ExhaustExit"; // TBD: handle like a muzzle.
+    }
+
     public int MAX_BULLETS = 3;
 
     public float RotateSpeed = 150f;
@@ -21,6 +37,8 @@ public class Player : Base2DBehaviour
     public Transform GhostPrefab;
 
     public Bullet BulletPrefab;
+    public Muzzle MuzzleChild;
+
 
     //private Transform[] Ghosts = new Transform[4];
     private ParticleSystem _exhaustParticleSystem;
@@ -45,19 +63,14 @@ public class Player : Base2DBehaviour
     {
         _thrustAudioSource = GetComponent<AudioSource>();
 
-        _bulletsContainer = GameManager.Instance.SceneRoot.FindOrCreateTempContainer("PlayerBulletsContainer");
+        _bulletsContainer = GameManager.Instance.SceneRoot.FindOrCreateTempContainer(GoNames.BULLET_CONTAINER_NAME);
 
-        this._exhaustParticleSystem = InstantiateParticleSystemAtTransform(ExhaustParticlePrefab, this.transform.FindChild("ExhaustExit").transform);
+        _exhaustParticleSystem = InstantiateParticleSystemAtTransform(ExhaustParticlePrefab, this.transform.FindChild(GoNames.EXHAUST_EXIT).transform);
         _exhaustParticleSystem.transform.rotation = new Quaternion(0f, 0f, -180f, 0f);
 
         _explosionParticleSystem = InstantiateParticleSystemAtTransform(ExplosionParticlePrefab, this.transform);
         
         _state = State.Alive;
-    }
-
-    void OnGUI()
-    {
-        //print(GetFrameRate());
     }
 
     void OnTriggerEnter2D(Collider2D other)
@@ -98,20 +111,6 @@ public class Player : Base2DBehaviour
         Destroy(this.gameObject, _explosionParticleSystem.duration + 0.5f);
     }
 
-    void OnDestroy()
-    {
-        // Cleanup
-        if (_exhaustParticleSystem != null)
-        {
-            _exhaustParticleSystem.Stop();
-        }
-        if (_explosionParticleSystem != null)
-        {
-            _explosionParticleSystem.Stop();
-        }
-        SafeDestroy( ref _exhaustParticleSystem);
-        SafeDestroy( ref _explosionParticleSystem);
-    }
 
     // Update is called once per frame
     void Update ()
@@ -121,12 +120,12 @@ public class Player : Base2DBehaviour
 
             //base.DebugForceSinusoidalFrameRate();
 
-            float horz = Input.GetAxisRaw("Horizontal");
+            float horz = Input.GetAxisRaw(Buttons.HORIZ);
 
             base.InstantAngleChange(horz, AngleIncrement, RotateSpeed);
 
 
-            float vert = Input.GetAxisRaw("Vertical");
+            float vert = Input.GetAxisRaw(Buttons.VERT);
             if (vert > 0.0f)
             {
                 var rigidBody = GetComponent<Rigidbody2D>();
@@ -148,13 +147,13 @@ public class Player : Base2DBehaviour
                 }
             }
 
-            bool firePressed = Input.GetButtonDown("Fire1") || Input.GetButtonDown("Jump");
+            bool firePressed = Input.GetButtonDown(Buttons.FIRE1) || Input.GetButtonDown(Buttons.JUMP);
             if(firePressed)
             {
                 FireBullet();
             }
 
-            bool hyperPressed = Input.GetButtonDown("HyperSpace") || Input.GetButtonDown("HyperSpace2");
+            bool hyperPressed = Input.GetButtonDown(Buttons.HYPERSPACE) || Input.GetButtonDown(Buttons.HYPERSPACE2);
             if( hyperPressed && (Time.time - _lastHyperSpaceTime > 1.0))
             {
                 GameManager.Instance.LevelManager.HyperSpace();
@@ -173,7 +172,7 @@ public class Player : Base2DBehaviour
             var newBullet = Instantiate(BulletPrefab);
             newBullet.Source = Bullet.Sources.PlayerShooter;
             newBullet.transform.parent = _bulletsContainer.transform;
-            newBullet.transform.position = this.transform.FindChild("Muzzle").transform.position;
+            newBullet.transform.position = MuzzleChild.transform.position;
             newBullet.transform.rotation = this.transform.rotation;
             //newBullet.transform.localScale = new Vector3(0.5f, 0.5f, 0);
             newBullet.GetComponent<Rigidbody2D>().AddRelativeForce(Vector2.up*1.4f, ForceMode2D.Impulse);
@@ -187,5 +186,30 @@ public class Player : Base2DBehaviour
     public void Show(bool b)
     {
         GetComponent<SpriteRenderer>().enabled = b;
+    }
+
+    void OnDestroy()
+    {
+        // Cleanup
+        if (_exhaustParticleSystem != null)
+        {
+            _exhaustParticleSystem.Stop();
+        }
+        if (_explosionParticleSystem != null)
+        {
+            _explosionParticleSystem.Stop();
+        }
+        SafeDestroy(ref _exhaustParticleSystem);
+        SafeDestroy(ref _explosionParticleSystem);
+    }
+
+    public static void ClearBullets()
+    {
+        var abc = GameManager.Instance.SceneRoot.FindOrCreateTempContainer(GoNames.BULLET_CONTAINER_NAME);
+        while (abc.transform.childCount > 0)
+        {
+            Destroy(abc.transform.GetChild(0).gameObject);
+        }
+
     }
 }

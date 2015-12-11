@@ -203,11 +203,18 @@ public class LevelManager : Base2DBehaviour {
 
         ShowGameOver(false);
         ShowInstructions(false);
+        ClearBullets(this);
         
         ShowInstructions(false);
         ClearAsteroids();
         StartLevel();
         Respawn(_player1, 0.5f);
+    }
+
+    private void ClearBullets(LevelManager levelManager)
+    {
+        Alien.ClearBullets();
+        Player.ClearBullets();
     }
 
     private void MakeNewPlayer()

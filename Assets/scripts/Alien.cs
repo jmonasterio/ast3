@@ -18,11 +18,18 @@ public class Alien : Base2DBehaviour
         Killed
     }
 
+    public struct GoNames
+    {
+        public const string ASTEROID_BULLET_CONTAINER = "AlienBulletContainer";
+    }
+
     public Sizes Size;
     public AudioClip ExplosionSound;
     public ParticleSystem ExplosionParticlePrefab;
     public int MAX_BULLETS = 1;
     public AudioClip ShootSound;
+    public Bullet BulletPrefab;
+    public Muzzle MuzzleChild;
 
     private ParticleSystem _explosionParticleSystem;
 
@@ -31,10 +38,8 @@ public class Alien : Base2DBehaviour
     private List<Vector3> _path = new List<Vector3>();
     private int _curPoint = 0;
     private float travelSpeed = 25.0f;
-    public Bullet BulletPrefab;
     private Bullet _bullet;
     private GameObject _bulletsContainer;
-    private GameObject _muzzle;
 
     public void SetPath(List<Vector3> newPath)
     {
@@ -45,12 +50,20 @@ public class Alien : Base2DBehaviour
     // Use this for initialization
     void Start()
     {
-        var camRect = GetCameraWorldRect();
-        _muzzle = this.transform.FindChild("Muzzle").gameObject;
-
-        _bulletsContainer = GameManager.Instance.SceneRoot.FindOrCreateTempContainer("AlienBulletContainer");
+        _bulletsContainer = GameManager.Instance.SceneRoot.FindOrCreateTempContainer(GoNames.ASTEROID_BULLET_CONTAINER);
 
         _explosionParticleSystem = InstantiateParticleSystemAtTransform(ExplosionParticlePrefab, this.transform);
+    }
+
+
+    public static void ClearBullets()
+    {
+        var abc = GameManager.Instance.SceneRoot.FindOrCreateTempContainer(GoNames.ASTEROID_BULLET_CONTAINER);
+        while (abc.transform.childCount > 0)
+        {
+            Destroy(abc.transform.GetChild(0).gameObject);
+        }
+
     }
 
 
@@ -101,7 +114,7 @@ public class Alien : Base2DBehaviour
             var newBullet = Instantiate(BulletPrefab);
             newBullet.Source = Bullet.Sources.AlienShooter;
             newBullet.transform.parent = _bulletsContainer.transform;
-            newBullet.transform.position = _muzzle.transform.position;
+            newBullet.transform.position = MuzzleChild.transform.position;
             newBullet.transform.rotation = this.transform.rotation;
             //newBullet.transform.localScale = new Vector3(2.0f, 2.0f, 0);
 
@@ -109,7 +122,7 @@ public class Alien : Base2DBehaviour
             Vector2 dir;
             if (target.HasValue)
             {
-                dir = target.Value - _muzzle.transform.position;
+                dir = target.Value - MuzzleChild.transform.position;
             }
             else
             {

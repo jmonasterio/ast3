@@ -1,13 +1,14 @@
 ﻿
 // TODO:
-// Clear bullets from last game if restart another game really fast.
+// x Clear bullets from last game if restart another game really fast.
 // Maybe a ShooterComponent
+// Handle exhaust like muzzle.
 // Refactor base2d into extensions
 // x Create bullet containers dynamically.
 // ManagedPlugins
 // New GameManager design
 // x Make alien shoot
-// x Hyperspace not working
+// x Hyperspace not working (once per second)
 // x Alien path finding
 // x Alien
 // x Pause before starting a new game because fire key starts it right away.
