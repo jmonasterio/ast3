@@ -1,7 +1,9 @@
 ﻿
 // TODO:
+// ManagedPlugins
+// New GameManager design
 // x Score doesn't show in Javascript
-// Script to fixup HTML
+// Script to fixup HTML (Build player pipeline).
 // Hyperspace not working
 // Alien
 // Pause before starting a new game because fire key starts it right away.

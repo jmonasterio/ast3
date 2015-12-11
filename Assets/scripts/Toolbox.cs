@@ -61,7 +61,10 @@ namespace Toolbox
 
     public class Base2DBehaviour : MonoBehaviour
     {
-
+        public void Show(bool b)
+        {
+            GetComponent<SpriteRenderer>().enabled = b;
+        }
 
         public Rect GetCameraWorldRect()
         {

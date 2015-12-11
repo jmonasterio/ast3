@@ -16,7 +16,7 @@ public class Bullet : Base2DBehaviour {
 
     void OnTriggerEnter2D(Collider2D other)
     {
-        if (other.gameObject.name.StartsWith("Asteroid")) // TBD: Improve.
+        if (other.gameObject.GetComponent<Asteroid>() != null) 
         {
             Asteroid ast = other.gameObject.GetComponent<Asteroid>(); // This is great. I can get associated script object for asteroid.
 
@@ -50,5 +50,14 @@ public class Bullet : Base2DBehaviour {
 
 
         }
+        else if (other.gameObject.GetComponent<Alien>() != null)
+        {
+
+            var alien = other.gameObject.GetComponent<Alien>();
+            GameManager.Instance.PlayClip(alien.ExplosionSound);
+            GameManager.Instance.LevelManager.DestroyAlien(alien, explode: true); //ize does not matter.
+            GameManager.Instance.Score += ((alien.Size == Alien.Sizes.Small) ? 1000 : 500);
+        }
+
     }
 }

@@ -4,7 +4,7 @@ using System.Collections;
 using Toolbox;
 
 
-
+[RequireComponent(typeof(LevelManager))] // Is this right, really?
 public class GameManager : Singleton<GameManager>
 {
     public int Score = 0;
@@ -40,9 +40,16 @@ public class GameManager : Singleton<GameManager>
 	}
 
     // Safer to play sounds on the game object, since bullets or or asteroids may get destroyed while sound is playing???
-    public void PlayClip(AudioClip clip)
+    public void PlayClip(AudioClip clip, bool loop = false)
     {
-        GetComponent<AudioSource>().PlayOneShot(clip, 1.0f);
+        if (_state == State.Over)
+        {
+            // No sound when not playing.
+            return;
+        }
+        var src = GetComponent<AudioSource>();
+        src.loop = loop;
+        src.PlayOneShot(clip, 1.0f);
     }
 
     public void PlayerKilled( Player player)
@@ -60,11 +67,6 @@ public class GameManager : Singleton<GameManager>
 
     }
 
-    public void LastAsteroidKilled(Player p)
-    {
-        LevelManager.StartLevel();
-    }
-
     // Update is called once per frame
 	void Update () {
 
@@ -72,11 +74,19 @@ public class GameManager : Singleton<GameManager>
 	    {
 	        if (_state == State.Over)
 	        {
-	            _state = State.Playing;
-	            Lives = 2;
-	            Score = 0;
-	            this.LevelManager.StartGame();
-	        }
-	    }
+                // Try to prevent game starting right after previous if you keep firing.
+	            if (LevelManager.CanStartGame())
+	            {
+	                Lives = 4;
+	                Score = 0;
+                    _state = State.Playing;
+                    this.LevelManager.StartGame();
+
+                }
+
+            }
+        }
+
     }
+
 }

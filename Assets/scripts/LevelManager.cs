@@ -8,7 +8,7 @@ public class LevelManager : Base2DBehaviour {
 
     public int Level { get; set; }
     public Asteroid[] AsteroidPrefabs;
-    public GameObject AlienPrefab; // TBD
+    public Alien AlienPrefab; // TBD
     public Player PlayerPrefab;
     public GameOver GameOverPrefab;
     public Instructions InstructionsPrefab;
@@ -16,6 +16,8 @@ public class LevelManager : Base2DBehaviour {
     public AudioClip Jaws1;
     public AudioClip Jaws2;
     public AudioClip FreeLifeSound;
+    public AudioClip AlienSoundBig;
+    public AudioClip AlienSoundSmall;
     public int FREE_USER_AT = 10000;
 
     private int _nextFreeLifeScore;
@@ -24,18 +26,20 @@ public class LevelManager : Base2DBehaviour {
     private Instructions _instructions;
     private Player _player1;
     private List<Asteroid> _asteroids = new List<Asteroid>();
+    private Alien _alien;
 
-    private DateTime _nextJawsSoundTime;
-    private int _jawsIntervalMs;
+    private float _nextJawsSoundTime;
+    private float _jawsIntervalSeconds;
     private bool _jawsAlternate;
     private Rect _camRect;
-
+    private double _disableStartButtonUntilTime; // TBD: Clunky
 
     // Use this for initialization
     void Start ()
     {
 
         _camRect = GetCameraWorldRect();
+        _disableStartButtonUntilTime = Time.time;
 
         _gameOver = Instantiate(GameOverPrefab);
         //_gameOver.transform.position = Vector3.zero; // TBD SPAWN
@@ -63,15 +67,15 @@ public class LevelManager : Base2DBehaviour {
             GameManager.Instance.PlayClip(FreeLifeSound);
         }
 
-        if (DateTime.Now > _nextJawsSoundTime)
+        if (Time.time > _nextJawsSoundTime)
         {
             if (_player1 != null) // Means we're in level
             {
-                if (_jawsIntervalMs > 180)
+                if (_jawsIntervalSeconds > 180.0f)
                 {
-                    _jawsIntervalMs -= 5;
+                    _jawsIntervalSeconds -= 5.0f;
                 }
-                _nextJawsSoundTime = DateTime.Now.AddMilliseconds(_jawsIntervalMs);
+                _nextJawsSoundTime = Time.time + _jawsIntervalSeconds;
                 if (_jawsAlternate)
                 {
                     GameManager.Instance.PlayClip(Jaws1);
@@ -84,6 +88,50 @@ public class LevelManager : Base2DBehaviour {
             }
         }
 
+        if (IsGamePlaying())
+        {
+            if (_alien == null)
+            {
+                if (Random.Range(0, 100) > 97)
+                {
+                    _alien = Instantiate(AlienPrefab);
+                    _alien.Size = (Random.Range(0, 3) == 0) ? Alien.Sizes.Small : Alien.Sizes.Big;
+                    _alien.SetPath(MakeRandomPath());
+                    _alien.transform.localScale = _alien.transform.localScale*(_alien.Size == Alien.Sizes.Small ? 1 : 2);
+
+                    if (IsGamePlaying())
+                    {
+                        _alien.PlaySound();
+                    }
+                }
+            }
+        }
+    }
+
+    private bool IsGamePlaying()
+    {
+        return Level > 0;
+    }
+
+    private List<Vector3> MakeRandomPath()
+    {
+        var camRect = GetCameraWorldRect();
+        var path = new List<Vector3>();
+
+        path.Add( new Vector3(_camRect.xMin -0.5f, Random.Range(_camRect.yMin*0.9f, _camRect.yMax*0.9f)));
+
+//        for (var segment = 0; segment <= 4; segment++)
+  //      {
+    //        path.Add( )
+     //   }
+        path.Add( new Vector3(_camRect.xMax + 0.5f, Random.Range(_camRect.yMin * 0.9f, _camRect.yMax * 0.9f)));
+
+        if (Random.Range(0, 2) == 0)
+        {
+            path.Reverse();
+        }
+
+        return path;
     }
 
     public void OnDestroy()
@@ -116,8 +164,18 @@ public class LevelManager : Base2DBehaviour {
         }
     }
 
+    public bool CanStartGame()
+    {
+        if (Time.time < _disableStartButtonUntilTime)
+        {
+            return false;
+        }
+        return true;
+    }
+
     public void StartGame()
     {
+        
         Level = 0;
         _nextFreeLifeScore = FREE_USER_AT;
 
@@ -237,14 +295,15 @@ public class LevelManager : Base2DBehaviour {
     public void StartLevel()
     {
         Level++;
-        _jawsIntervalMs = 900;
+        _jawsIntervalSeconds = 0.9f;
         _jawsAlternate = true;
-        _nextJawsSoundTime = DateTime.Now.AddMilliseconds(_jawsIntervalMs);
+        _nextJawsSoundTime += _jawsIntervalSeconds;
         AddAsteroids((int) (2 + Level)); // 3.0 + Mathf.Log( (float) Level)));
     }
 
     private void ShowGameOver(bool b)
     {
+        _disableStartButtonUntilTime = Time.time + 1.5;
         _gameOver.GetComponent<MeshRenderer>().enabled = b;
         if (b)
         {
@@ -265,6 +324,7 @@ public class LevelManager : Base2DBehaviour {
         ShowInstructions(true);
     }
 
+
     public void Respawn(Player player, float delay )
     {
         _player1 = null;
@@ -282,12 +342,23 @@ public class LevelManager : Base2DBehaviour {
 
     }
 
+    public void DestroyAlien(Alien alien, bool explode)
+    {
+        Debug.Assert( alien.GetInstanceID() == _alien.GetInstanceID());
+        _alien = null;
+        if (explode)
+        {
+            CreateAsteroidOrAlienExplosion(alien.transform.position);
+        }
+        Destroy(alien.gameObject); 
+    }
+
     public void ReplaceAsteroidWith(Asteroid ast, int p1, Asteroid.Sizes astSize, Bullet bullet)
     {
         bool removed = _asteroids.Remove(ast);
         System.Diagnostics.Debug.Assert(removed);
 
-        CreateAsteroidExplosion(ast); // TBD: Maybe put sound here, too.
+        CreateAsteroidOrAlienExplosion(ast.transform.position); // TBD: Maybe put sound here, too.
 
         for (int ii = 0; ii < p1; ii++)
         {
@@ -331,16 +402,17 @@ public class LevelManager : Base2DBehaviour {
         return newAst;
     }
 
-    private void CreateAsteroidExplosion(Asteroid ast)
+    private void CreateAsteroidOrAlienExplosion(Vector3 position)
     {
         var explosion = Instantiate(AsteroidExplosionParticlePrefab);
         explosion.transform.parent = this.transform.parent.transform.FindChild("AsteroidField");
-        explosion.transform.position = ast.transform.position;
+        explosion.transform.position = position;
         explosion.transform.rotation = this.transform.rotation;
         //_exhaust.enableEmission = true;
         explosion.Play();
         DestroyObject( explosion, explosion.duration + 0.25f);
 
     }
+
 
 }
