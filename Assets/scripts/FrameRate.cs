@@ -30,7 +30,7 @@ public class FrameRate : MonoBehaviour
 
 	    if (DebugSinusoidalFrameRate)
 	    {
-            http://answers.unity3d.com/questions/300467/how-to-limit-frame-rate-in-unity-editor.html
+            // http://answers.unity3d.com/questions/300467/how-to-limit-frame-rate-in-unity-editor.html
 #if UNITY_EDITOR
                 QualitySettings.vSyncCount = 0;  // VSync must be disabled
                 Application.targetFrameRate = (int)((Mathf.Sin(Time.time) + 1.05f) * 60);

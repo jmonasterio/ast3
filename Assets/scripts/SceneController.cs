@@ -4,7 +4,7 @@ using System.Collections.Generic;
 using Toolbox;
 using Random = UnityEngine.Random;
 
-public class LevelManager : Base2DBehaviour {
+public class SceneController : Base2DBehaviour {
 
     public int Level { get; set; }
     public Asteroid[] AsteroidPrefabs;
@@ -61,16 +61,8 @@ public class LevelManager : Base2DBehaviour {
     {
         _asteroidContainer = GameManager.Instance.SceneRoot.FindOrCreateTempContainer("AsteroidContainer");
         _camRect = GetCameraWorldRect();
-
-        _gameOver = Instantiate(GameOverPrefab);
-        _gameOver.transform.rotation = Quaternion.identity;
-        _gameOver.transform.parent = GameManager.Instance.SceneRoot;
-        _gameOver.gameObject.SetActive(true);
-
-        _instructions = Instantiate(InstructionsPrefab);
-        _instructions.transform.rotation = Quaternion.identity;
-        _instructions.transform.parent = GameManager.Instance.SceneRoot;
-        _instructions.gameObject.SetActive(true);
+        _gameOver = GameOverPrefab.InstantiateInTransform(GameManager.Instance.SceneRoot);
+        _instructions = InstructionsPrefab.InstantiateInTransform(GameManager.Instance.SceneRoot);
 
         ShowGameOver(true);
         ShowInstructions(true);
@@ -80,13 +72,42 @@ public class LevelManager : Base2DBehaviour {
     // Update is called once per frame
     void Update ()
 	{
-        if (GameManager.Instance.Score > _nextFreeLifeScore)
-        {
-            GameManager.Instance.Lives++;
-            _nextFreeLifeScore += FREE_USER_AT;
-            GameManager.Instance.PlayClip(FreeLifeSound);
-        }
+        // TBD: These could be components. Especially JAWS sound and free lives.
 
+        UpdateFreeLives();
+
+        UpdateJawsSound();
+
+        UpdateAlienSpawn();
+    }
+
+    private void UpdateAlienSpawn()
+    {
+        if (IsGamePlaying())
+        {
+            if (_alien == null)
+            {
+                float diff = Time.time - _lastAsteroidKilled;
+
+                if ((diff > 8.0f) || GetRemainingAsteroidCount() < 5 && Random.Range(0, 1000) > (996 - Level*2))
+                {
+                    _alien = Instantiate(AlienPrefab);
+                    _alien.Size = (Random.Range(0, 3) == 0) ? Alien.Sizes.Small : Alien.Sizes.Big;
+                    _alien.SetPath(MakeRandomPath());
+                    _alien.transform.localScale = _alien.transform.localScale*
+                                                  (_alien.Size == Alien.Sizes.Small ? 0.3f : 0.6f);
+
+                    if (IsGamePlaying())
+                    {
+                        _alien.PlaySound(true);
+                    }
+                }
+            }
+        }
+    }
+
+    private void UpdateJawsSound()
+    {
         if (Time.time > _nextJawsSoundTime)
         {
             if (_player1 != null) // Means we're in level
@@ -107,26 +128,15 @@ public class LevelManager : Base2DBehaviour {
                 _jawsAlternate = !_jawsAlternate;
             }
         }
+    }
 
-        if (IsGamePlaying())
+    private void UpdateFreeLives()
+    {
+        if (GameManager.Instance.Score > _nextFreeLifeScore)
         {
-            if (_alien == null)
-            {
-                float diff =  Time.time - _lastAsteroidKilled;
-
-                if ( (diff > 8.0f) || GetRemainingAsteroidCount()<5 &&  Random.Range(0, 1000) > (996-Level*2))
-                {
-                    _alien = Instantiate(AlienPrefab);
-                    _alien.Size = (Random.Range(0, 3) == 0) ? Alien.Sizes.Small : Alien.Sizes.Big;
-                    _alien.SetPath(MakeRandomPath());
-                    _alien.transform.localScale = _alien.transform.localScale*(_alien.Size == Alien.Sizes.Small ? 0.3f : 0.6f);
-
-                    if (IsGamePlaying())
-                    {
-                        _alien.PlaySound( true);
-                    }
-                }
-            }
+            GameManager.Instance.Lives++;
+            _nextFreeLifeScore += FREE_USER_AT;
+            GameManager.Instance.PlayClip(FreeLifeSound);
         }
     }
 
@@ -211,7 +221,7 @@ public class LevelManager : Base2DBehaviour {
         Respawn(_player1, 0.5f);
     }
 
-    private void ClearBullets(LevelManager levelManager)
+    private void ClearBullets(SceneController sceneController)
     {
         Alien.ClearBullets();
         Player.ClearBullets();

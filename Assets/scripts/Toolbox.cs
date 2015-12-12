@@ -13,10 +13,31 @@ namespace Toolbox
         {
             return Mathf.Round(f/multiple)*multiple;
         }
+        public static Vector2 MakeRandom2D()
+        {
+            return new Vector2(Random.Range(-1.0f, 1.0f), Random.Range(-1.0f, 1.0f)).normalized;
+        }
+
+        public static Vector2 To2D(Vector3 v3)
+        {
+            return new Vector2(v3.x, v3.y);
+        }
+
+        public static Vector3 From2D(Vector2 v2)
+        {
+            return new Vector3(v2.x, v2.y, 0.0f);
+        }
+
+
     }
 
     public static class GameObjectExt
     {
+        public static void Show(this GameObject go, bool b)
+        {
+            go.GetComponent<SpriteRenderer>().enabled = b;
+        }
+
         /// <summary>
         /// Gets or add a component. Usage example:
         /// BoxCollider boxCollider = transform.GetOrAddComponent<BoxCollider>();
@@ -56,8 +77,57 @@ namespace Toolbox
             return instance;
         }
 
+        /// <summary>
+        /// Prefab contains position and rotation.
+        /// </summary>
+        /// <typeparam name="T"></typeparam>
+        /// <param name="prefab"></param>
+        /// <param name="parent"></param>
+        /// <returns></returns>
+        public static T InstantiateInTransform<T>(this T prefab, Transform parent) where T : Component
+        {
+            var instance = Object.Instantiate(prefab);
+            instance.transform.parent = parent;
+            instance.transform.position = prefab.transform.position;
+            instance.transform.rotation = prefab.transform.rotation;
+            return instance;
+        }
+
+        public static void SafeDestroy(ref Component obj)
+        {
+            if (obj != null)
+            {
+                Object.Destroy(obj);
+            }
+            obj = null;
+        }
+
+        public static void SafeDestroy(ref GameObject obj)
+        {
+            if (obj != null)
+            {
+                Object.Destroy(obj);
+            }
+            obj = null;
+        }
+
+        public static void SafeDestroy(ref ParticleSystem obj)
+        {
+            if (obj != null)
+            {
+                Object.Destroy(obj.gameObject);
+            }
+            obj = null;
+        }
 
 
+        public static void DestroyChildren(GameObject abc)
+        {
+            while (abc.transform.childCount > 0)
+            {
+                Object.Destroy(abc.transform.GetChild(0).gameObject);
+            }
+        }
     }
 
     public static class CoroutineUtils
@@ -106,20 +176,13 @@ namespace Toolbox
         }
     }
 
-    public class Base2DBehaviour : MonoBehaviour
+    public static class UnityExt
     {
 
+    }
 
-        protected Vector2 MakeRandom2D()
-        {
-            return new Vector2(Random.Range(-1.0f, 1.0f), Random.Range(-1.0f, 1.0f)).normalized;
-        }
-
-
-        public void Show(bool b)
-        {
-            GetComponent<SpriteRenderer>().enabled = b;
-        }
+    public class Base2DBehaviour : MonoBehaviour
+    {
 
         public Rect GetCameraWorldRect()
         {
@@ -133,106 +196,8 @@ namespace Toolbox
             return camRect;
         }
 
-        public Vector2 To2D(Vector3 v3)
-        {
-            return new Vector2(v3.x, v3.y);
-        }
-
-        public Vector3 From2D(Vector2 v2)
-        {
-            return new Vector3(v2.x, v2.y, 0.0f);
-        }
 
 
-        private float? _instantTargetAngle;
-
-        /// <summary>
-        /// Rotate at smooth rotation rate. Stop at next increment after key lifted
-        /// </summary>
-        /// <param name="horz"></param>
-        /// <param name="angleIncrement"></param>
-        /// <param name="rotateSpeed"></param>
-        protected void InstantAngleChange(float horz, float angleIncrement, float rotateSpeed)
-        {
-            var curAngle = transform.eulerAngles.z;
-            if (horz != 0.0f)
-            {
-                var dir = -Mathf.Sign(horz);
-                if (dir != 0.0f)
-                {
-                    float angleToRotate = dir*rotateSpeed*Time.deltaTime;
-                    var targetAngle = curAngle + angleToRotate;
-                    transform.Rotate(0.0f, 0.0f, targetAngle - curAngle);
-
-                    // In case we have to stop.
-                    _instantTargetAngle = MathfExt.RoundToNearestMultiple(targetAngle + dir*angleIncrement,
-                        angleIncrement);
-                }
-
-            }
-            else
-            {
-                if (_instantTargetAngle.HasValue)
-                {
-                    var newAngle = Mathf.MoveTowardsAngle(curAngle, _instantTargetAngle.Value,
-                        rotateSpeed*Time.deltaTime);
-                    transform.Rotate(0.0f, 0.0f, newAngle - curAngle);
-
-                    if (newAngle == curAngle)
-                    {
-                        _instantTargetAngle = null;
-                    }
-                }
-
-
-            }
-
-        }
-
-        float _smoothTargetAngle;
-
-        protected void SmoothAngleChange(float horz, float angleIncrement, float rotateSpeed)
-        {
-            var curAngle = transform.eulerAngles.z;
-            if (horz != 0.0f)
-            {
-                // Time factored in later.
-                float angleToRotate = -Mathf.Sign(horz)*angleIncrement;
-                _smoothTargetAngle = MathfExt.RoundToNearestMultiple(curAngle + angleToRotate, angleIncrement);
-            }
-            if (0.0f != Mathf.DeltaAngle(_smoothTargetAngle, curAngle))
-            {
-                var newAngle = Mathf.MoveTowardsAngle(curAngle, _smoothTargetAngle, rotateSpeed*Time.deltaTime);
-                transform.Rotate(0.0f, 0.0f, newAngle - curAngle);
-            }
-        }
-
-        protected void SafeDestroy(ref Component obj)
-        {
-            if (obj != null)
-            {
-                Destroy(obj);
-            }
-            obj = null;
-        }
-
-        protected void SafeDestroy(ref GameObject obj)
-        {
-            if (obj != null)
-            {
-                Destroy(obj);
-            }
-            obj = null;
-        }
-
-        protected void SafeDestroy(ref ParticleSystem obj)
-        {
-            if (obj != null)
-            {
-                Destroy(obj.gameObject);
-            }
-            obj = null;
-        }
 
     }
 }

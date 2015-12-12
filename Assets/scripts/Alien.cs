@@ -120,7 +120,7 @@ public class Alien : Base2DBehaviour
             newBullet.transform.rotation = this.transform.rotation;
             //newBullet.transform.localScale = new Vector3(2.0f, 2.0f, 0);
 
-            var target = GameManager.Instance.LevelManager.GetAlienTargetOrNull();
+            var target = GameManager.Instance.SceneController.GetAlienTargetOrNull();
             Vector2 dir;
             if (target.HasValue)
             {
@@ -128,7 +128,7 @@ public class Alien : Base2DBehaviour
             }
             else
             {
-                dir = MakeRandom2D();
+                dir = MathfExt.MakeRandom2D();
             }
 
             newBullet.GetComponent<Rigidbody2D>().AddRelativeForce(dir *0.5f, ForceMode2D.Impulse);
@@ -161,10 +161,10 @@ public class Alien : Base2DBehaviour
     private void AlienKilled()
     {
         _state = States.Killed;
-        Show(false);
+        this.gameObject.Show(false);
         _explosionParticleSystem.Play();
         GetComponent<Rigidbody2D>().velocity *= 0.5f; // Slow down when killed.
-        GameManager.Instance.LevelManager.DestroyAlien(this, explode: true);
+        GameManager.Instance.SceneController.DestroyAlien(this, explode: true);
         GameManager.Instance.PlayClip(ExplosionSound);
         GameManager.Instance.Score += ((this.Size == Alien.Sizes.Small) ? 1000 : 500);
         Destroy(this.gameObject, _explosionParticleSystem.duration + 0.5f);
@@ -176,7 +176,7 @@ public class Alien : Base2DBehaviour
         if (_curPoint >= _path.Count)
         {
             //If end of path, we're done.
-            GameManager.Instance.LevelManager.DestroyAlien(this, explode: false);
+            GameManager.Instance.SceneController.DestroyAlien(this, explode: false);
         }
 
     }
@@ -189,8 +189,8 @@ public class Alien : Base2DBehaviour
         {
             audioSource.loop = true;
             audioSource.clip = (this.Size == Alien.Sizes.Small)
-                ? GameManager.Instance.LevelManager.AlienSoundSmall
-                : GameManager.Instance.LevelManager.AlienSoundBig;
+                ? GameManager.Instance.SceneController.AlienSoundSmall
+                : GameManager.Instance.SceneController.AlienSoundBig;
             audioSource.Play();
         }
         else

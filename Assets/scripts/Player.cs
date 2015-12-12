@@ -4,16 +4,6 @@ using Toolbox;
 
 public class Player : Base2DBehaviour
 {
-    public class Buttons
-    {
-        public const string HORIZ = "Horizontal";
-        public const string VERT = "Vertical";
-        public const string HYPERSPACE = "HyperSpace";
-        public const string HYPERSPACE2 = "HyperSpace2";
-        public const string JUMP = "Jump";
-        public const string FIRE1 = "Fire1";
-    }
-
     public class GoNames
     {
         public const string BULLET_CONTAINER_NAME = "PlayerBulletsContainer";
@@ -124,12 +114,15 @@ public class Player : Base2DBehaviour
 
             //base.DebugForceSinusoidalFrameRate();
 
-            float horz = Input.GetAxisRaw(Buttons.HORIZ);
+            float horz = Input.GetAxisRaw(GameManager.Buttons.HORIZ);
 
-            base.InstantAngleChange(horz, AngleIncrement, RotateSpeed);
+            // TBD: Move this into the component. Will need an ENABLED flag, tied to KILLED.
+            GetComponent<Rotator>().InstantAngleChange(horz, AngleIncrement, RotateSpeed);
 
 
-            float vert = Input.GetAxisRaw(Buttons.VERT);
+            float vert = Input.GetAxisRaw(GameManager.Buttons.VERT);
+
+            // Maybe a thruster component? Or maybe Rotator+Thruster=PlayerMover component.
             if (vert > 0.0f)
             {
                 var rigidBody = GetComponent<Rigidbody2D>();
@@ -151,31 +144,30 @@ public class Player : Base2DBehaviour
                 }
             }
 
-            bool firePressed = Input.GetButtonDown(Buttons.FIRE1) || Input.GetButtonDown(Buttons.JUMP);
+            bool firePressed = Input.GetButtonDown(GameManager.Buttons.FIRE1) || Input.GetButtonDown(GameManager.Buttons.JUMP);
             if(firePressed)
             {
                 FireBullet();
             }
 
-            bool hyperPressed = Input.GetButtonDown(Buttons.HYPERSPACE) || Input.GetButtonDown(Buttons.HYPERSPACE2);
+            bool hyperPressed = Input.GetButtonDown(GameManager.Buttons.HYPERSPACE) || Input.GetButtonDown(GameManager.Buttons.HYPERSPACE2);
             if( hyperPressed && (Time.time - _lastHyperSpaceTime > 1.0))
             {
-                GameManager.Instance.LevelManager.HyperSpace();
+                GameManager.Instance.SceneController.HyperSpace();
                 _lastHyperSpaceTime = Time.time;
             }
         }
 
     }
 
-
+    // TBD: Shooter component.
     private void FireBullet()
     {
 
         if (_bulletsContainer.transform.childCount < MAX_BULLETS)
         {
-            var newBullet = Instantiate(BulletPrefab);
+            var newBullet = BulletPrefab.InstantiateInTransform(_bulletsContainer.transform);
             newBullet.Source = Bullet.Sources.PlayerShooter;
-            newBullet.transform.parent = _bulletsContainer.transform;
             newBullet.transform.position = MuzzleChild.transform.position;
             newBullet.transform.rotation = this.transform.rotation;
             //newBullet.transform.localScale = new Vector3(0.5f, 0.5f, 0);
@@ -203,17 +195,14 @@ public class Player : Base2DBehaviour
         {
             _explosionParticleSystem.Stop();
         }
-        SafeDestroy(ref _exhaustParticleSystem);
-        SafeDestroy(ref _explosionParticleSystem);
+        GameObjectExt.SafeDestroy(ref _exhaustParticleSystem);
+        GameObjectExt.SafeDestroy(ref _explosionParticleSystem);
     }
 
     public static void ClearBullets()
     {
         var abc = GameManager.Instance.SceneRoot.FindOrCreateTempContainer(GoNames.BULLET_CONTAINER_NAME);
-        while (abc.transform.childCount > 0)
-        {
-            Destroy(abc.transform.GetChild(0).gameObject);
-        }
+        GameObjectExt.DestroyChildren(abc);
 
     }
 }

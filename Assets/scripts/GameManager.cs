@@ -4,38 +4,47 @@ using System.Collections;
 using Toolbox;
 
 
-[RequireComponent(typeof(LevelManager))] // Is this right, really?
+[RequireComponent(typeof(AudioSource))] 
 public class GameManager : Base2DBehaviour
 {
+    public struct Buttons
+    {
+        public const string HORIZ = "Horizontal";
+        public const string VERT = "Vertical";
+        public const string HYPERSPACE = "HyperSpace";
+        public const string HYPERSPACE2 = "HyperSpace2";
+        public const string JUMP = "Jump";
+        public const string FIRE1 = "Fire1";
+    }
+
     public int Score = 0;
     public int Lives = 0;
+    public SceneController SceneControllerPrefab;
+
+    public static GameManager Instance;
 
     private enum State
     {
         Playing = 0,
         Over = 1
     }
-
-    public static GameManager Instance;
-
     private State _state = State.Over;
 
-    internal Transform SceneRoot;
-
-    public LevelManager LevelManagerPrefab;
-
     [HideInInspector]
-    public LevelManager LevelManager;
+    public SceneController SceneController;
+    [HideInInspector]
+    public Transform SceneRoot;
 
 
-	// Use this for initialization
-	void Awake()
+    // Use this for initialization
+    void Awake()
 	{
+        DontDestroyOnLoad(this); // Keep running across different scenes.
         Instance = this; // Simple singleton.
         SceneRoot = this.transform.parent;
 	    this.transform.parent = SceneRoot;
-	    LevelManager = Instantiate(LevelManagerPrefab); 
-	    LevelManager.transform.parent = this.transform.parent;
+	    SceneController = Instantiate(SceneControllerPrefab); 
+	    SceneController.transform.parent = this.transform.parent;
 	}
 
     // Safer to play sounds on the game object, since bullets or or asteroids may get destroyed while sound is playing???
@@ -56,30 +65,31 @@ public class GameManager : Base2DBehaviour
         if (this.Lives < 1)
         {
             _state = State.Over;
-            LevelManager.GameOver(player);
+            SceneController.GameOver(player);
         }
         else
         {
-            LevelManager.Respawn(player, 2.0f);
+            SceneController.Respawn(player, 2.0f);
 
         }
 
     }
 
     // Update is called once per frame
-	void Update () {
+    void Update()
+    {
+        if (_state == State.Over)
+        {
+            if (Input.GetButton(Buttons.FIRE1))
+            {
 
-	    if (Input.GetButton("Fire1"))
-	    {
-	        if (_state == State.Over)
-	        {
                 // Try to prevent game starting right after previous if you keep firing.
-	            if (LevelManager.CanStartGame())
-	            {
-	                Lives = 4;
-	                Score = 0;
+                if (SceneController.CanStartGame())
+                {
+                    Lives = 4;
+                    Score = 0;
                     _state = State.Playing;
-                    this.LevelManager.StartGame();
+                    this.SceneController.StartGame();
 
                 }
 

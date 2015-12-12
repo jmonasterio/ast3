@@ -22,7 +22,7 @@ public class Wrapped2D : Base2DBehaviour
         }
         var camRect = _camRect.Value;
 
-        var t = To2D(this.transform.position);
+        var t = MathfExt.To2D(this.transform.position);
 
         // If this fails, you did not call base.Start();
         if (camRect.Contains(t))
@@ -45,6 +45,6 @@ public class Wrapped2D : Base2DBehaviour
         {
             t.y = camRect.yMax;
         }
-        this.transform.position = From2D(t);
+        this.transform.position = MathfExt.From2D(t);
     }
 }
