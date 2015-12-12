@@ -52,7 +52,9 @@ public class Alien : Base2DBehaviour
     {
         _bulletsContainer = GameManager.Instance.SceneRoot.FindOrCreateTempContainer(GoNames.ASTEROID_BULLET_CONTAINER);
 
-        _explosionParticleSystem = InstantiateParticleSystemAtTransform(ExplosionParticlePrefab, this.transform);
+        _explosionParticleSystem = ExplosionParticlePrefab.InstantiateAtTransform( this.transform);
+        _explosionParticleSystem.loop = false;
+        _explosionParticleSystem.Stop();
     }
 
 

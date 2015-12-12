@@ -65,11 +65,15 @@ public class Player : Base2DBehaviour
 
         _bulletsContainer = GameManager.Instance.SceneRoot.FindOrCreateTempContainer(GoNames.BULLET_CONTAINER_NAME);
 
-        _exhaustParticleSystem = InstantiateParticleSystemAtTransform(ExhaustParticlePrefab, this.transform.FindChild(GoNames.EXHAUST_EXIT).transform);
+        _exhaustParticleSystem = ExhaustParticlePrefab.InstantiateAtTransform( this.transform.FindChild(GoNames.EXHAUST_EXIT).transform);
+        _exhaustParticleSystem.loop = false;
+        _exhaustParticleSystem.Stop();
         _exhaustParticleSystem.transform.rotation = new Quaternion(0f, 0f, -180f, 0f);
 
-        _explosionParticleSystem = InstantiateParticleSystemAtTransform(ExplosionParticlePrefab, this.transform);
-        
+        _explosionParticleSystem = ExplosionParticlePrefab.InstantiateAtTransform( this.transform);
+        _explosionParticleSystem.loop = false;
+        _explosionParticleSystem.Stop();
+
         _state = State.Alive;
     }
 

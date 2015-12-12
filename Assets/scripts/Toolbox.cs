@@ -1,6 +1,7 @@
 ﻿using System;
 using System.Collections;
 using UnityEngine;
+using Object = UnityEngine.Object;
 using Random = UnityEngine.Random;
 
 namespace Toolbox
@@ -45,6 +46,17 @@ namespace Toolbox
                 return trans.gameObject;
             }
         }
+
+        public static T InstantiateAtTransform<T>(this T prefab, Transform tr) where T:Component
+        {
+            var instance = Object.Instantiate(prefab);
+            instance.transform.parent = tr;
+            instance.transform.position = tr.position;
+            instance.transform.rotation = tr.rotation;
+            return instance;
+        }
+
+
 
     }
 
@@ -96,17 +108,6 @@ namespace Toolbox
 
     public class Base2DBehaviour : MonoBehaviour
     {
-        protected static ParticleSystem InstantiateParticleSystemAtTransform(ParticleSystem prefab, Transform tr)
-        {
-            var explosionParticleSystem = Instantiate(prefab);
-            explosionParticleSystem.transform.parent = tr;
-            explosionParticleSystem.transform.position = tr.position;
-            explosionParticleSystem.transform.rotation = tr.rotation;
-            explosionParticleSystem.loop = false;
-            explosionParticleSystem.Stop();
-            return explosionParticleSystem;
-        }
-
 
 
         protected Vector2 MakeRandom2D()
