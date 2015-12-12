@@ -5,7 +5,7 @@ using Toolbox;
 
 
 [RequireComponent(typeof(LevelManager))] // Is this right, really?
-public class GameManager : Singleton<GameManager>
+public class GameManager : Base2DBehaviour
 {
     public int Score = 0;
     public int Lives = 0;
@@ -16,12 +16,9 @@ public class GameManager : Singleton<GameManager>
         Over = 1
     }
 
-    private State _state = State.Over;
+    public static GameManager Instance;
 
-    public static GameManager Current
-    {
-        get { return Instance; }
-    }
+    private State _state = State.Over;
 
     internal Transform SceneRoot;
 
@@ -34,7 +31,9 @@ public class GameManager : Singleton<GameManager>
 	// Use this for initialization
 	void Awake()
 	{
-	    SceneRoot = this.transform.parent;
+        Instance = this; // Simple singleton.
+        SceneRoot = this.transform.parent;
+	    this.transform.parent = SceneRoot;
 	    LevelManager = Instantiate(LevelManagerPrefab); 
 	    LevelManager.transform.parent = this.transform.parent;
 	}

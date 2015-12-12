@@ -338,7 +338,7 @@ public class LevelManager : Base2DBehaviour {
         _gameOver.GetComponent<MeshRenderer>().enabled = b;
         if (b)
         {
-            _gameOver.BlinkText(2.0f, 0.1f, Color.gray);
+            _gameOver.GetComponent<Blinker>().BlinkText(2.0f, 0.1f, Color.gray);
         }
     }
 
@@ -369,7 +369,7 @@ public class LevelManager : Base2DBehaviour {
         StartCoroutine(CoroutineUtils.DelaySeconds(() =>
         {
             MakeNewPlayer();
-            _player1.BlinkSprite(1.0f, 0.05f);
+            _player1.GetComponent<Blinker>().BlinkSprite(1.0f, 0.05f);
 
             // Change the count AFTER the respawn occurs. It looks better.
             GameManager.Instance.Lives--;

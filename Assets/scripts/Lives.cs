@@ -30,7 +30,7 @@ namespace Assets.Scripts
                     GetComponent<TextMesh>().text = string.Empty;
                 }
                 _lives = lives;
-                BlinkText(2.0f, 0.1f, Color.gray);
+                GetComponent<Blinker>().BlinkText(2.0f, 0.1f, Color.gray);
             }
         }
     }
