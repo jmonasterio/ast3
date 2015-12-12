@@ -17,6 +17,6 @@ public class Asteroid : Base2DBehaviour
     public Sizes Size = Sizes.Small;
 
     // Update is called once per frame
-	void Update () {
+	void FixedUpdate () {
     }
 }

@@ -35,7 +35,6 @@ public class GameManager : Base2DBehaviour
     [HideInInspector]
     public Transform SceneRoot;
 
-
     // Use this for initialization
     void Awake()
 	{

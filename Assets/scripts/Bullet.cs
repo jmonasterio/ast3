@@ -19,7 +19,7 @@ public class Bullet : Base2DBehaviour {
 	}
 	
 	// Update is called once per frame
-    void Update()
+    void FixedUpdate()
     {
 	}
 
