@@ -70,7 +70,7 @@ public class Alien : Base2DBehaviour
 
 
     // Update is called once per frame
-    void FixedUpdate ()
+    void Update ()
     {
         var rigidBody = GetComponent<Rigidbody2D>();
 

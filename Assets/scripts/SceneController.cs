@@ -70,7 +70,7 @@ public class SceneController : Base2DBehaviour {
     }
 
     // Update is called once per frame
-    void Update ()
+    void Update()
 	{
         // TBD: These could be components. Especially JAWS sound and free lives.
 

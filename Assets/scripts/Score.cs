@@ -13,7 +13,7 @@ public class Score : Base2DBehaviour
 	}
 	
 	// Update is called once per frame
-	void Update ()
+	void Update()
 	{
 	    var curScore = GameManager.Instance.Score;
         if (_score != curScore )

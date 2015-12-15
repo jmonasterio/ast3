@@ -11,7 +11,7 @@ public class GameOver : Base2DBehaviour
 	}
 	
 	// Update is called once per frame
-	void Update () {
+	void FixeUpdate () {
 	
 	}
 }
