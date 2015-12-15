@@ -130,17 +130,26 @@ public class Player : Base2DBehaviour
                 rigidBody.velocity = Vector2.ClampMagnitude(rigidBody.velocity, MaxSpeed);
                 if (_exhaustParticleSystem.isStopped)
                 {
+                    _exhaustParticleSystem.loop = true;
+                    _exhaustParticleSystem.Play();
+                }
+                if (!_thrustAudioSource.isPlaying)
+                {
                     _thrustAudioSource.loop = true;
                     _thrustAudioSource.Play();
-                    _exhaustParticleSystem.Play();
+                    Debug.Assert(_thrustAudioSource.isPlaying);
                 }
             }
             else
             {
                 if (_exhaustParticleSystem.isPlaying)
                 {
-                    _thrustAudioSource.Stop();
                     _exhaustParticleSystem.Stop();
+                }
+                if (_thrustAudioSource.isPlaying)
+                {
+                    _thrustAudioSource.Stop();
+                    Debug.Assert(!_thrustAudioSource.isPlaying);
                 }
             }
 
