@@ -54,9 +54,8 @@ public class GameManager : Base2DBehaviour
             // No sound when not playing.
             return;
         }
-        var src = GetComponent<AudioSource>();
-        src.loop = loop;
-        src.PlayOneShot(clip, 1.0f);
+
+        this.GetComponent<AudioPoolController>().PlayClip(clip, loop);
     }
 
     public void PlayerKilled( Player player)
