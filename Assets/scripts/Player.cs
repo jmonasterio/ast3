@@ -107,7 +107,7 @@ public class Player : Base2DBehaviour
 
 
     // Update is called once per frame
-    void Update()
+    void FixedUpdate()
     {
         if (_state != State.Killed)
         {
